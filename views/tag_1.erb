@@ -4,9 +4,9 @@
 <style>
     <%# .bar {
         fill: steelblue;
-    } %>
-
-    <%# .toolTip {
+    }
+    
+    %><%# .toolTip {
         position: absolute;
         display: none;
         min-width: 80px;
@@ -15,35 +15,34 @@
         border: 1px solid #6F257F;
         padding: 14px;
         text-align: center;
-        } %>
+    }
     
-    div.tooltip {
-  position: absolute;
-  text-align: center;
-  width: 100px;
-  height: 70px;
-  padding: 2px;
-  font: 12px sans-serif;
-  background: lightsteelblue;
-  border: 0px;
-  border-radius: 8px;
-  pointer-events: none;
-}
+    %>div.tooltip {
+        position: absolute;
+        text-align: center;
+        width: 100px;
+        height: 70px;
+        padding: 2px;
+        font: 12px sans-serif;
+        background: lightsteelblue;
+        border: 0px;
+        border-radius: 8px;
+        pointer-events: none;
+    }
 </style>
 
 
 
 <head>
-    
+
     <h1> </h1>
 </head>
 
 <body>
-<svg id = "scatter" width = "700" height = "500"> </svg>
+    <svg id="scatter" width="700" height="500"> </svg>
     <div></div>
     <script src="http://d3js.org/d3.v4.min.js"></script>
     <script>
-    
         //set the dimensions and margins of the graph
         <%# var margin = {
                 top: 20,
@@ -141,46 +140,51 @@
             .call(d3.axisLeft(y));
  });             %>
 
-var svg = d3.select("#scatter"),
-    margin = {top: 20, right: 20, bottom: 30, left: 50},
-    width = +svg.attr("width"),
-    height = +svg.attr("height"),
-    domainwidth = width - margin.left - margin.right,
-    domainheight = height - margin.top - margin.bottom;
-  
-var g = svg.append("g")
-		.attr("transform", "translate(" + margin.top + "," + margin.top + ")");
+        var svg = d3.select("#scatter"),
+            margin = {
+                top: 20,
+                right: 20,
+                bottom: 30,
+                left: 50
+            },
+            width = +svg.attr("width"),
+            height = +svg.attr("height"),
+            domainwidth = width - margin.left - margin.right,
+            domainheight = height - margin.top - margin.bottom;
 
-var div = d3.select("body").append("div")
-    .attr("class", "tooltip")
-    .style("opacity", 0);
-  
-g.append("rect")
-    .attr("width", width - margin.left - margin.right)
-    .attr("height", height - margin.top - margin.bottom)
-    .attr("fill", "#F6F6F6");
+        var g = svg.append("g")
+            .attr("transform", "translate(" + margin.top + "," + margin.top + ")");
 
- d3.csv("csv/r_X_csv.csv", function(error, data) {
+        var div = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+        g.append("rect")
+            .attr("width", width - margin.left - margin.right)
+            .attr("height", height - margin.top - margin.bottom)
+            .attr("fill", "#F6F6F6");
+
+        d3.csv("csv/r_X_csv.csv", function(error, data) {
             // console.log("data", data)
-        
-        var unitSoldArray = [];
-        var savingsArray = [];
-        var productDetails = {};
-        var currentNetCostByProduct = [];
+
+            var unitSoldArray = [];
+            var savingsArray = [];
+            var productDetails = {};
+            var currentNetCostByProduct = [];
             data.forEach(function(d) {
-                
+
                 if (d.generic_name != "") {
                     productDetails["id"] = (d.id);
                     productDetails["generic_name"] = (d.generic_name);
                     productDetails["unitSold"] = (d.rolling_yearly_usage);
                     unitSoldArray.push(parseFloat(d.rolling_yearly_usage));
-                   // currentNetCostByProduct.push(productDetails);
+                    // currentNetCostByProduct.push(productDetails);
                 };
                 if (d.priority == "CURRENT #1") {
                     productDetails["current_manufacturer"] = (d.manufacturer_code);
                     productDetails["currentNuberOneNetCost"] = (d.net_cost)
                     productDetails["currrentNumberOneSavings"] = (0)
-                    
+
                 };
                 if (d.priority == 1) {
                     productDetails["numOneManufacturer"] = (d.manufacturer_code);
@@ -191,7 +195,7 @@ g.append("rect")
                     productDetails = {};
                 };
             });
-           console.log("currentNetCostByProduct", currentNetCostByProduct);
+            console.log("currentNetCostByProduct", currentNetCostByProduct);
 
 var x = d3.scaleLinear()
     .domain(padExtent([-d3.max(savingsArray),d3.max(savingsArray)]))
