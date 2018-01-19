@@ -6,7 +6,7 @@
         fill: steelblue;
     } %>
 
-    .toolTip {
+    <%# .toolTip {
         position: absolute;
         display: none;
         min-width: 80px;
@@ -15,7 +15,20 @@
         border: 1px solid #6F257F;
         padding: 14px;
         text-align: center;
-        }
+        } %>
+    
+    div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 100px;
+  height: 70px;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+}
 </style>
 
 
@@ -26,7 +39,7 @@
 </head>
 
 <body>
-<svg id = "scatter" width = "1000" height = "1000"> </svg>
+<svg id = "scatter" width = "700" height = "500"> </svg>
     <div></div>
     <script src="http://d3js.org/d3.v4.min.js"></script>
     <script>
@@ -138,7 +151,9 @@ var svg = d3.select("#scatter"),
 var g = svg.append("g")
 		.attr("transform", "translate(" + margin.top + "," + margin.top + ")");
 
-var tooltip = d3.select("body").append("div").attr("class", "toolTip");
+var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
   
 g.append("rect")
     .attr("width", width - margin.left - margin.right)
@@ -182,7 +197,7 @@ var x = d3.scaleLinear()
     .domain(padExtent([-d3.max(savingsArray),d3.max(savingsArray)]))
     .range(padExtent([0, domainwidth]));
 var y = d3.scaleLinear()
-    .domain(padExtent([-d3.max(unitSoldArray),d3.max(unitSoldArray)]))
+    .domain(padExtent([0,d3.max(unitSoldArray)]))
     .range(padExtent([domainheight, 0]));
     
      g.selectAll("circle")
@@ -192,24 +207,30 @@ var y = d3.scaleLinear()
       .attr("r", 7)
       .attr("cx", function(d) { return x(d.numberOneSavings); })
       .attr("cy", function(d) { return y(d.unitSold); })
-      .on("mouseover", function(d){
-            tooltip
-              .style("left", d3.event.pageX - 50 + "px")
-              .style("top", d3.event.pageY - 70 + "px")
-              .style("display", "inline-block")
-              .html( "Manufacturer Info" + "<br>" + (d.numOneManufacturer) + "<br>" + (d.generic_name) + "<br>" + (d.numberOneNetCost) + "<br>" + (d.numberOneSavings));
-        })
-    		.on("mouseout", function(d){ tooltip.style("display", "none");});
-    	<%# .style("fill", function(d) {        
+      <%# .style("fill", function(d) {        
           if (d.value >= 3 && d.consequence <= 3) {return "#60B19C"} // Top Left
           else if (d.value >= 3 && d.consequence >= 3) {return "#8EC9DC"} // Top Right
           else if (d.value <= 3 && d.consequence >= 3) {return "#D06B47"} // Bottom Left
           else { return "#A72D73" } //Bottom Right          %> 
       //});
+      .on("mouseover", function(d) {
+       div.transition()
+         .duration(200)
+         .style("opacity", .9)
+       div.html( "Manufacturer Info" + "<br>" + (d.numOneManufacturer) + "<br>" + (d.generic_name) + "<br>" + (d.numberOneNetCost) + "<br>" + (d.numberOneSavings))
+         .style("left", (d3.event.pageX) + "px")
+         .style("top", (d3.event.pageY - 28) + "px");
+       })
+     .on("mouseout", function(d) {
+       div.transition()
+         .duration(500)
+         .style("opacity", 0);
+       });
+  
 
  g.append("g")
       .attr("class", "x axis")
-      .attr("transform", "translate(0," + y.range()[0] / 2 + ")")
+      .attr("transform", "translate(1," + y.range()[0] / 1 + ")")
       .call(d3.axisBottom(x).ticks(5));
 
   g.append("g")
