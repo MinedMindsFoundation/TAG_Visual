@@ -2,11 +2,11 @@
 <meta charset="utf-8">
 <html>
 <style>
-    <%# .bar {
+    .bar {
         fill: steelblue;
     }
     
-    %><%# .toolTip {
+    <%# .toolTip {
         position: absolute;
         display: none;
         min-width: 80px;
@@ -20,8 +20,8 @@
     %>div.tooltip {
         position: absolute;
         text-align: center;
-        width: 100px;
-        height: 70px;
+        width: 175px;
+        height: 100px;
         padding: 2px;
         font: 12px sans-serif;
         background: lightsteelblue;
@@ -174,14 +174,16 @@
                 };
                 if (d.priority == "CURRENT #1") {
                     productDetails["current_manufacturer"] = (d.manufacturer_code);
-                    productDetails["currentNuberOneNetCost"] = (d.net_cost)
-                    productDetails["currrentNumberOneSavings"] = (0)
+                    productDetails["currentNuberOneNetCost"] = (d.net_cost);
+                    productDetails["currrentNumberOneSavings"] = (0);
+                    productDetails["currentNumberOnePriority"] = (d.priority);
 
                 };
                 if (d.priority == 1) {
                     productDetails["numOneManufacturer"] = (d.manufacturer_code);
                     productDetails["numberOneNetCost"] = (d.net_cost);
                     productDetails["numberOneSavings"] = (d.saving);
+                    productDetails["numberOnePriority"] = (d.priority);
                     currentNetCostByProduct.push(productDetails);
                     savingsArray.push(parseFloat(d.saving));
                     productDetails = {};
@@ -197,6 +199,7 @@
                 .range(padExtent([domainheight, 0]));
 
             g.selectAll("#currentone")
+            .on("click", console.log("monkley"))
                 .data(currentNetCostByProduct)
                 .enter().append("circle")
                 .attr("id", "currentone")
@@ -214,6 +217,21 @@
                     } else {
                         return "green"
                     } //Bottom Right 
+                })
+               // .on("click", buildBarChart( function(d) { return d.id; }))
+              //.on("click", console.log(this))
+                .on("mouseover", function(d) {
+                    div.transition()
+                        .duration(200)
+                        .style("opacity", .9)
+                    div.html("Product Details" + "<br>" + (d.current_manufacturer) + "<br>" + (d.generic_name) + "<br>" + (d.currentNumberOnePriority)  +"<br>" + (d.currentNuberOneNetCost) + "<br>" + (d.currrentNumberOneSavings))
+                        .style("left", (d3.event.pageX) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px");
+                })
+                .on("mouseout", function(d) {
+                    div.transition()
+                        .duration(500)
+                        .style("opacity", 0);
                 });
 
             g.selectAll("#numberOne")
@@ -235,11 +253,12 @@
                         return "green"
                     } //Bottom Right 
                 })
+                .on("click", buildBarChart)
                 .on("mouseover", function(d) {
                     div.transition()
                         .duration(200)
                         .style("opacity", .9)
-                    div.html("Manufacturer Info" + "<br>" + (d.numOneManufacturer) + "<br>" + (d.generic_name) + "<br>" + (d.numberOneNetCost) + "<br>" + (d.numberOneSavings))
+                    div.html("Product Details" + "<br>" + (d.numOneManufacturer) + "<br>" + (d.generic_name) + "<br>" + (d.numberOnePriority)  +"<br>" + (d.numberOneNetCost) + "<br>" + (d.numberOneSavings))
                         .style("left", (d3.event.pageX) + "px")
                         .style("top", (d3.event.pageY - 28) + "px");
                 })
@@ -266,6 +285,47 @@
   	        if (p === undefined) p = 1;
   	        return ([e[0] - p, e[1] + p]);
             }
+        function buildBarChart(id){
+                var margin = {top: 20, right: 20, bottom: 30, left: 40},
+                                width = 960 - margin.left - margin.right,
+                                height = 500 - margin.top - margin.bottom;
+
+// set the ranges
+                var x = d3.scaleBand()
+                        .range([0, width])
+                        .padding(0.1);
+                var y = d3.scaleLinear()
+                        .range([height, 0]);
+                        
+                var svg = d3.select("#barChart").append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                    .attr("transform", 
+                        "translate(" + margin.left + "," + margin.top + ")");
+
+
+                d3.csv("csv/r_X_csv.csv", function(error, data) {
+            
+
+                    var unitSoldArray = [];
+                    var savingsArray = [];
+                    var productDetails = {};
+                    var currentNetCostByProduct = [];
+                    data.forEach(function(d) {
+                        if (d.id == id) {
+                            console.log("d", d)
+                            return d 
+                        };
+                      
+                    })
+                });
+                 console.log("helloooooo")   
+        }
+
+
+
+       
     </script>
 
 </body>
