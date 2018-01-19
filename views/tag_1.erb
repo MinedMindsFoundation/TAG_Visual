@@ -177,11 +177,11 @@ g.append("rect")
            console.log("currentNetCostByProduct", currentNetCostByProduct);
 
 var x = d3.scaleLinear()
-    .domain(padExtent([0,d3.max(savingsArray)]))
-    .range(padExtent([0, domainwidth]));
+    .domain([-d3.min(savingsArray),d3.max(savingsArray)])
+    .range([0, domainwidth]);
 var y = d3.scaleLinear()
-    .domain(padExtent([0,d3.max(unitSoldArray)]))
-    .range(padExtent([domainheight, 0]));
+    .domain([-d3.min(unitSoldArray),d3.max(unitSoldArray)])
+    .range([domainheight, 0]);
     
      g.selectAll("circle")
       .data(currentNetCostByProduct)
@@ -197,7 +197,7 @@ var y = d3.scaleLinear()
           else { return "#A72D73" } //Bottom Right          %> 
       //});
 
-  g.append("g")
+ g.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + y.range()[0] / 2 + ")")
       .call(d3.axisBottom(x).ticks(5));
@@ -212,10 +212,7 @@ var y = d3.scaleLinear()
 
     });
 
-function padExtent(e, p) {
-  	if (p === undefined) p = 1;
-  	return ([e[0] - p, e[1] + p]);
-}        
+        
     </script>
 
 </body>
