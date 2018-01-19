@@ -177,10 +177,10 @@ g.append("rect")
            console.log("currentNetCostByProduct", currentNetCostByProduct);
 
 var x = d3.scaleLinear()
-    .domain(padExtent([0,d3.max(savingsArray)]))
+    .domain(padExtent([-d3.max(savingsArray),d3.max(savingsArray)]))
     .range(padExtent([0, domainwidth]));
 var y = d3.scaleLinear()
-    .domain(padExtent([0,d3.max(unitSoldArray)]))
+    .domain(padExtent([-d3.max(unitSoldArray),d3.max(unitSoldArray)]))
     .range(padExtent([domainheight, 0]));
     
      g.selectAll("circle")
