@@ -229,6 +229,7 @@
                     div.html("Manufacturer Info" + "<br>" + (d.numOneManufacturer) + "<br>" + (d.generic_name) + "<br>" + (d.numberOneNetCost) + "<br>" + (d.numberOneSavings))
                         .style("left", (d3.event.pageX) + "px")
                         .style("top", (d3.event.pageY - 28) + "px");
+
                 })
                 .on("mouseout", function(d) {
                     div.transition()
