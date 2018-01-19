@@ -6,10 +6,6 @@
         fill: steelblue;
     }
 
-    .bar:hover {
-        fill: brown;
-    }
-
     .toolTip {
         position: absolute;
         display: none;
@@ -69,85 +65,55 @@
         var myData = [];
         var myArr = [];
         var bidArr = [];
+        var productDetails = {}
+        var currentNetCostByProduct = [];
             data.forEach(function(d) {
-                var myBids = {}
+                
                 if (d.generic_name != "") {
-                    myBids["medicine"] = (d.generic_name);
-                    if (myBids !== {}) {
-                        myArr.push(myBids);
-                        //console.log("myBids", myBids)
-                    };
+                    productDetails["id"] = (d.id);
+                    productDetails["generic_name"] = (d.generic_name);
+                   // currentNetCostByProduct.push(productDetails);
                 };
                 if (d.priority == "CURRENT #1") {
-                    myBids["bid"] = (d.bid_price);
-                    //console.log(parseInt(d.bid_price))
-                    bidArr.push(parseFloat(d.bid_price))
-                    if (myBids !== {}) {
-                        myArr.push(myBids);
-                        // console.log("myBids", myBids)
-                    };
+                    productDetails["current_manufacturer"] = (d.manufacturer_code);
+                    productDetails["netCost"] = (d.net_cost);
+                    currentNetCostByProduct.push(productDetails);
+                    bidArr.push(parseFloat(d.net_cost));
+                    productDetails = {};
                 };
             });
-           console.log("myArr", myArr);
-        var i;
-        var c1 = 0
-        var c2 = 1
-        console.log("Below", myArr.length)
-        for (i = -1; i < myArr.length; i++, i++) {
-            function extend(obj, src) {
-                Object.keys(src).forEach(function(key) {
-                    obj[key] = src[key];
-                });
-                return obj;
-            };
-            //console.log("c1", c1);
-            //console.log("c2", c2);
-           if (myArr[c1] != null){
-           var cBn = extend(myArr[c1], myArr[c2])};
-            //myArr.splice(myArr[c2]);
-            //console.log("cbn", cBn);
-            myData.push(cBn);
-            var c1 = c1 + 2;
-            var c2 = c2 + 2;
-        };
-        myData.pop();
-        //console.log("myData", myData);
-        console.log(bidArr);
-
-
-
-
-
-        // Scale the range of the data in the domains
+           console.log("currentNetCostByProduct", currentNetCostByProduct);
+        
+// Scale the range of the data in the domains
         x.domain([0, d3.max(bidArr)
         ])
-        y.domain(myData.map(function(d) {
-            console.log("medsssss", d.medicine);
-            return d.medicine;
+        y.domain(currentNetCostByProduct.map(function(d) {
+            console.log("id", d.id);
+            return d.id;
         }));
         //y.domain([0, d3.max(data, function(d) { return d.sales; })]);
 
         // append the rectangles for the bar chart
         svg.selectAll(".bar")
-            .data(myData)
+            .data(currentNetCostByProduct)
             .enter().append("rect")
             .attr("class", "bar")
             //.attr("x", function(d) { return x(d.sales); })
             .attr("width", function(d) {
                 //console.log("d", d.bid)
-                return x(d.bid);
+                return x(d.netCost);
             })
             .attr("y", function(d) {
                 //console.log("d", d.medicine)
-                return y(d.medicine);
+                return y(d.id);
             })
             .attr("height", y.bandwidth())
-            .on("mousemove", function(d){
+            .on("mouseover", function(d){
             tooltip
               .style("left", d3.event.pageX - 50 + "px")
               .style("top", d3.event.pageY - 70 + "px")
               .style("display", "inline-block")
-              .html( "Bid" + "<br>" + "$" + (d.bid));
+              .html( "Manufacturer Info" + "<br>" + (d.current_manufacturer) + "<br>" + (d.generic_name) + "<br>" + (d.netCost));
         })
     		.on("mouseout", function(d){ tooltip.style("display", "none");});
 
