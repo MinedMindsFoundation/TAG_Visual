@@ -206,25 +206,15 @@ var y1 = d3.scaleLinear()
     .domain(padExtent([0,d3.max(unitSoldArray)]))
     .range(padExtent([domainheight, 0]));
     
-     g.selectAll("#currentone")
+     g.selectAll("circle")
       .data(currentNetCostByProduct)
-      .enter().append("circle")
-      .attr("id", "currentone")  
-      .attr("class", "dot")
-      .attr("r", 7)
-      .attr("cx", function(d) { return x(d.currrentNumberOneSavings); })
-      .attr("cy", function(d) { return y(d.unitSold); })
-
-      g.selectAll("#numberOne")
-      .data(currentNetCostByProduct)
-      .enter().append("circle")
-      .attr("id", "numberOne")  
+    .enter().append("circle")
       .attr("class", "dot")
       .attr("r", 7)
       .attr("cx", function(d) { return x(d.numberOneSavings); })
       .attr("cy", function(d) { return y(d.unitSold); })
       .attr("cx1", function(d) { return x1(d.currrentNumberOneSavings);})
-      .attr("cy1", function(d) { return y1(d.unitSold);})
+      .attr("cy1", function(d) { return y(d.unitSold);})
       <%# .style("fill", function(d) {        
           if (d.value >= 3 && d.consequence <= 3) {return "#60B19C"} // Top Left
           else if (d.value >= 3 && d.consequence >= 3) {return "#8EC9DC"} // Top Right
