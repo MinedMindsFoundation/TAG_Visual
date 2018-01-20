@@ -254,8 +254,7 @@
                 })
                 .on('click', function(d, i) {
                         d3.select(this)
-                          .transition()
-                          .attr('r', 20)
+                          console.log("d", d);
                     })
                 .on("mouseover", function(d) {
                     div.transition()
