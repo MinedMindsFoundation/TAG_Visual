@@ -199,7 +199,6 @@
                 .range(padExtent([domainheight, 0]));
 
             g.selectAll("#currentone")
-            .on("click", console.log("monkley"))
                 .data(currentNetCostByProduct)
                 .enter().append("circle")
                 .attr("id", "currentone")
