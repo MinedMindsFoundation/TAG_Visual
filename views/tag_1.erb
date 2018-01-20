@@ -254,7 +254,8 @@
                 })
                 .on('click', function(d, i) {
                         d3.select(this)
-                          console.log("d", d);
+                        buildBarChart(d)
+                          //console.log("d", d);
                     })
                 .on("mouseover", function(d) {
                     div.transition()
@@ -288,6 +289,7 @@
   	        return ([e[0] - p, e[1] + p]);
             }
         function buildBarChart(id){
+                console.log("id", id);
                 var margin = {top: 20, right: 20, bottom: 30, left: 40},
                                 width = 960 - margin.left - margin.right,
                                 height = 500 - margin.top - margin.bottom;
