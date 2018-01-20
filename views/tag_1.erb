@@ -253,7 +253,11 @@
                         return "green"
                     } //Bottom Right 
                 })
-                .on("click", buildBarChart)
+                .on('click', function(d, i) {
+                        d3.select(this)
+                          .transition()
+                          .attr('r', 20)
+                    })
                 .on("mouseover", function(d) {
                     div.transition()
                         .duration(200)
@@ -314,13 +318,13 @@
                     var currentNetCostByProduct = [];
                     data.forEach(function(d) {
                         if (d.id == id) {
-                            console.log("d", d)
+                            //console.log("d", d)
                             return d 
                         };
                       
                     })
                 });
-                 console.log("helloooooo")   
+                // console.log("helloooooo")   
         }
 
 
