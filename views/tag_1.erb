@@ -40,7 +40,7 @@
 
 <body>
     <svg id="scatter" width="700" height="500"> </svg>
-    <svg id = "barChart" width="700" height="500"> </svg>
+    
     <div></div>
     <script src="http://d3js.org/d3.v4.min.js"></script>
     <script>
@@ -255,6 +255,7 @@
                 })
                 .on('click', function(product) {
                         d3.select(this)
+                        clearBarChart()
                         buildBarChart(product)
                           //console.log("d", d);
                     })
@@ -285,6 +286,11 @@
 
         });
 
+        function clearBarChart() {
+                d3.select("#barChart").remove()
+        }
+                
+
         function padExtent(e, p) {
   	        if (p === undefined) p = 1;
   	        return ([e[0] - p, e[1] + p]);
@@ -302,9 +308,10 @@
                 var y = d3.scaleLinear()
                         .range([height, 0]);
                         
-                var svg = d3.select("#barChart").append("svg")
+                var svg = d3.select("body").append("svg")
                     .attr("width", width + margin.left + margin.right)
                     .attr("height", height + margin.top + margin.bottom)
+                    .attr("id", "barChart")
                 .append("g")
                     .attr("transform", 
                         "translate(" + margin.left + "," + margin.top + ")");
