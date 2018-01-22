@@ -252,10 +252,10 @@
                         return "green"
                     } //Bottom Right 
                 })
-                .on('click', function(d, i) {
+                .on('click', function(id) {
                         d3.select(this)
-                        buildBarChart(d)
-                          //console.log("d", d);
+                        buildBarChart(id)
+                          console.log("d", id);
                     })
                 .on("mouseover", function(d) {
                     div.transition()
@@ -309,16 +309,12 @@
                         "translate(" + margin.left + "," + margin.top + ")");
 
 
-                d3.csv("csv/r_X_csv.csv", function(error, data) {
+                d3.csv("csv/r_X_csv.csv", function(id) {
             
 
-                    var unitSoldArray = [];
-                    var savingsArray = [];
-                    var productDetails = {};
-                    var currentNetCostByProduct = [];
-                    data.forEach(function(d) {
+                    id.forEach(function(d) {
                         if (d.id == id) {
-                            //console.log("d", d)
+                            console.log("this is the for each do", d);
                             return d 
                         };
                       
