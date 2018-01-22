@@ -40,7 +40,7 @@
 
 <body>
     <svg id="scatter" width="700" height="500"> </svg>
-    <svg id = "barChart"> </svg>
+    <svg id = "barChart" width="700" height="500"> </svg>
     <div></div>
     <script src="http://d3js.org/d3.v4.min.js"></script>
     <script>
@@ -253,9 +253,9 @@
                         return "green"
                     } //Bottom Right 
                 })
-                .on('click', function(f) {
+                .on('click', function(product) {
                         d3.select(this)
-                        buildBarChart(f)
+                        buildBarChart(product)
                           //console.log("d", d);
                     })
                 .on("mouseover", function(d) {
@@ -289,7 +289,7 @@
   	        if (p === undefined) p = 1;
   	        return ([e[0] - p, e[1] + p]);
             }
-        function buildBarChart(f){
+        function buildBarChart(product){
                 //console.log("d", d);
                 var margin = {top: 20, right: 20, bottom: 30, left: 40},
                                 width = 960 - margin.left - margin.right,
@@ -311,15 +311,41 @@
 
 
                 d3.csv("csv/r_X_csv.csv", function(d) {
-            
+                var barChartData = [];
 
                     d.forEach(function(d) {
-                        if (d.id == f.id) {
-                            console.log("this is the for each do", d.id);
-                            return d 
+                        if (d.id == product.id) {
+                            //console.log("this is the for each do", product.id);
+                            //console.log("thid id d", d);
+                            barChartData.push(d)
                         };
                       
                     })
+                var barProductDetails = barChartData.shift(); 
+                    console.log("this is bar data array", barChartData);
+                    console.log("tis is bar data after shift", barProductDetails)
+            
+                     x.domain(barChartData.map(function(d) { return d.priority; }));
+                    y.domain([0, d3.max(barChartData, function(d) { return d.net_cost; })]);
+
+                    // append the rectangles for the bar chart
+                    svg.selectAll(".bar")
+                        .data(barChartData)
+                        .enter().append("rect")
+                        .attr("class", "bar")
+                        .attr("x", function(d) { return x(d.priority); })
+                        .attr("width", x.bandwidth())
+                        .attr("y", function(d) { return y(d.net_cost); })
+                        .attr("height", function(d) { return height - y(d.net_cost); });
+
+                    // add the x Axis
+                    svg.append("g")
+                        .attr("transform", "translate(0," + height + ")")
+                        .call(d3.axisBottom(x));
+
+                    // add the y Axis
+                    svg.append("g")
+                        .call(d3.axisLeft(y));
                 });
                 // console.log("helloooooo")   
         }
