@@ -40,6 +40,7 @@
 
 <body>
     <svg id="scatter" width="700" height="500"> </svg>
+    <svg id = "barChart"> </svg>
     <div></div>
     <script src="http://d3js.org/d3.v4.min.js"></script>
     <script>
@@ -252,10 +253,10 @@
                         return "green"
                     } //Bottom Right 
                 })
-                .on('click', function(id) {
+                .on('click', function(f) {
                         d3.select(this)
-                        buildBarChart(id)
-                          console.log("d", id);
+                        buildBarChart(f)
+                          //console.log("d", d);
                     })
                 .on("mouseover", function(d) {
                     div.transition()
@@ -288,8 +289,8 @@
   	        if (p === undefined) p = 1;
   	        return ([e[0] - p, e[1] + p]);
             }
-        function buildBarChart(id){
-                console.log("id", id);
+        function buildBarChart(f){
+                //console.log("d", d);
                 var margin = {top: 20, right: 20, bottom: 30, left: 40},
                                 width = 960 - margin.left - margin.right,
                                 height = 500 - margin.top - margin.bottom;
@@ -309,12 +310,12 @@
                         "translate(" + margin.left + "," + margin.top + ")");
 
 
-                d3.csv("csv/r_X_csv.csv", function(id) {
+                d3.csv("csv/r_X_csv.csv", function(d) {
             
 
-                    id.forEach(function(d) {
-                        if (d.id == id) {
-                            console.log("this is the for each do", d);
+                    d.forEach(function(d) {
+                        if (d.id == f.id) {
+                            console.log("this is the for each do", d.id);
                             return d 
                         };
                       
