@@ -302,25 +302,28 @@
 
             d3.csv("csv/r_X_csv.csv", function(d) {
                 var barChartData = [];
+                var netCostData = []
 
                 d.forEach(function(d) {
                     if (d.id == product.id) {
                         //console.log("this is the for each do", product.id);
                         //console.log("thid id d", d);
+                        netCostData.push(parseFloat(d.net_cost));
                         barChartData.push(d)
                     };
 
                 })
+                netCostData.shift();
                 var barProductDetails = barChartData.shift();
+                //console.log("THIS IS HERE", netCostData)
                 // console.log("this is bar data array", barChartData);
                 // console.log("tis is bar data after shift", barProductDetails)
 
                 x.domain(barChartData.map(function(d) {
                     return d.priority;
                 }));
-                y.domain([0, d3.max(barChartData, function(d) {
-                    return d.net_cost;
-                })]);
+                y.domain([0, d3.max(netCostData)
+                ]);
 
                 // append the rectangles for the bar chart
                 svg.selectAll(".bar")
@@ -395,7 +398,7 @@ function builtdPieChart(currentNetCostByProduct){
 
         var pie = d3.pie()
             .sort(null)
-            .value(function(d) { return d.manufacturer_code; });
+            .value(function(d) { return d.manufacturer; });
 
         var path = d3.arc()
             .outerRadius(radius - 10)
@@ -423,25 +426,25 @@ function builtdPieChart(currentNetCostByProduct){
                     var pieChartHash = {};
                     console.log("hash", pieChartHash)
 
-                    if(d.manufacturer_code in pieChartHash){
-                            //console.log("post-results", m_code)
-                            //console.log("post-results", pieChartHash[m_code] += 1)
-                            pieChartHash[m_code] += 1
+                    if(d.manufacturer in pieChartHash){
+                            console.log("post-results", d.manufacturer_code)
+                            console.log("post-results", pieChartHash[manufacturer] += 1);
+                            //pieChartHash[m_code] += 1
                     }
                     else{
                         //console.log("this is here", d)
                         pieChartHash["manufacturer"] = d.manufacturer_code
                         pieChartHash["value"] = 1
-                        pieChartArray.push(pieChartHash);
+                        
                         };
-                    
+                    pieChartArray.push(pieChartHash)
                         console.log("results", pieChartHash)
                     
                 })
-                console.log("this is an array", pieChartArray);
+                console.log("this is an array", Object.values(pieChartArray));
 
                  var arc = g.selectAll(".arc")
-                        .data(pie(pieChartHash))
+                        .data(pie(pieChartArray))
                         .enter().append("g")
                         .attr("class", "arc");
 
@@ -449,7 +452,7 @@ function builtdPieChart(currentNetCostByProduct){
                         .attr("d", path)
                         .attr("fill", function(d) { 
                             //console.log("this is what we are looking at", d)
-                            return color(d.manufacturer_code); });
+                            return color(d.manufacturer); });
 
                     arc.append("text")
                         .attr("transform", function(d) { return "translate(" + label.centroid(d) + ")"; })
