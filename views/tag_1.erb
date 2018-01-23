@@ -3,7 +3,7 @@
 <html>
 <style>
     .bar {
-        fill: steelblue;
+        fill: darkgreen;
     }
     
     <%# .toolTip {
@@ -262,7 +262,7 @@
                             return "red"
                         } else {
                             return "green"
-                        } 
+                        }
                     })
                     d3.select(this).style("fill", "blue")
                     clearBarChart()
@@ -274,7 +274,7 @@
                         .duration(200)
                         .style("opacity", .9)
                     div.html((d.generic_name) + "<br>" + "Manufacturer:" + (d.numOneManufacturer) + "<br>" + "Net Cost $" + (d.numberOneNetCost) + "<br>" + "Projected Savings $" + (d.numberOneSavings))
-                    // div.html("Product Details" + "<br>" + "Manufacturer:" + (d.numOneManufacturer) + "<br>" + "Generic Name:" + (d.generic_name) + "<br>" + "Priority:" + (d.numberOnePriority) + "<br>" + "Net Cost $" + (d.numberOneNetCost) + "<br>" + "Projected Savings $" + (d.numberOneSavings))
+                        // div.html("Product Details" + "<br>" + "Manufacturer:" + (d.numOneManufacturer) + "<br>" + "Generic Name:" + (d.generic_name) + "<br>" + "Priority:" + (d.numberOnePriority) + "<br>" + "Net Cost $" + (d.numberOneNetCost) + "<br>" + "Projected Savings $" + (d.numberOneSavings))
                         .style("left", (d3.event.pageX) + "px")
                         .style("top", (d3.event.pageY - 28) + "px");
                 })
@@ -371,6 +371,17 @@
                     .attr("height", function(d) {
                         return height - y(d.net_cost);
                     })
+                    .style("fill", function(d) {
+                        console.log("HERE", d)
+                        if (d.priority == "CURRENT #1") {
+                            return "blue"
+                        };
+                        if (d.saving.includes('-')) {
+                            return "red"
+                        } else {
+                            return "green"
+                        } //Bottom Right 
+                    })
                     .on("mouseover", function(d) {
                         div.transition()
                             .duration(200)
@@ -447,7 +458,7 @@
                 });
                 //console.log("results", Object.keys(priorityCount))
                 //console.log("other results", Object.values(priorityCount))
-                //console.log("this is a hash", priorityCount);
+                console.log("this is a hash", priorityCount);
                 var pieChartArray = [];
                 var pieKeys = Object.keys(priorityCount);
                 var pieValues = Object.values(priorityCount);
@@ -475,6 +486,7 @@
 
                 var radius = Math.min(width - padding, height - padding) / 2;
                 var color = d3.scaleOrdinal(d3.schemeCategory10);
+                clearPieChart();
                 d3.select('body')
                     .append('div')
                     .attr('id', "chart");
@@ -596,6 +608,10 @@
                     .text(d => `${d.manufacturer} (${d.value})`);
 
                 keys.exit().remove();
+
+                function clearPieChart() {
+                    d3.select("#chart").remove()
+                }
             });
 
 
