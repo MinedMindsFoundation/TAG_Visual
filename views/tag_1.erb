@@ -424,11 +424,11 @@ function builtdPieChart(currentNetCostByProduct){
                 var pieChartArray = [];
                 pieChartData.forEach(function(d) {
                     var pieChartHash = {};
-                    console.log("hash", pieChartHash)
+                    //console.log("hash", pieChartHash)
 
-                    if(d.manufacturer in pieChartHash){
-                            console.log("post-results", d.manufacturer_code)
-                            console.log("post-results", pieChartHash[manufacturer] += 1);
+                    if(d.manufacturer in pieChartHash.manufacturer){
+                            //console.log("post-results", d.manufacturer_code)
+                            console.log("post-results", pieChartHash.manufacturer);
                             //pieChartHash[m_code] += 1
                     }
                     else{
@@ -437,6 +437,7 @@ function builtdPieChart(currentNetCostByProduct){
                         pieChartHash["value"] = 1
                         
                         };
+                        //console.log("before the push", pieChartHash)
                     pieChartArray.push(pieChartHash)
                         console.log("results", pieChartHash)
                     
