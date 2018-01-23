@@ -5,7 +5,7 @@
     .bar {
         fill: steelblue;
     }
-
+    
     <%# .toolTip {
         position: absolute;
         display: none;
@@ -16,7 +16,7 @@
         padding: 14px;
         text-align: center;
     }
-
+    
     %>div.tooltip {
         position: absolute;
         text-align: center;
@@ -29,12 +29,12 @@
         border-radius: 8px;
         pointer-events: none;
     }
-
+    
     .arc text {
         font: 10px sans-serif;
         text-anchor: middle;
     }
-
+    
     .arc path {
         stroke: #fff;
     }
@@ -234,7 +234,7 @@
                     clearBarChart()
                     buildBarChart(product)
                     builtdPieChart(currentNetCostByProduct)
-                    //console.log("d", d);
+                        //console.log("d", d);
                 })
                 .on("mouseover", function(d) {
                     div.transition()
@@ -302,28 +302,25 @@
 
             d3.csv("csv/r_X_csv.csv", function(d) {
                 var barChartData = [];
-                var netCostData = []
 
                 d.forEach(function(d) {
                     if (d.id == product.id) {
                         //console.log("this is the for each do", product.id);
                         //console.log("thid id d", d);
-                        netCostData.push(parseFloat(d.net_cost));
                         barChartData.push(d)
                     };
 
                 })
-                netCostData.shift();
                 var barProductDetails = barChartData.shift();
-                //console.log("THIS IS HERE", netCostData)
                 // console.log("this is bar data array", barChartData);
                 // console.log("tis is bar data after shift", barProductDetails)
 
                 x.domain(barChartData.map(function(d) {
                     return d.priority;
                 }));
-                y.domain([0, d3.max(netCostData)
-                ]);
+                y.domain([0, d3.max(barChartData, function(d) {
+                    return d.net_cost;
+                })]);
 
                 // append the rectangles for the bar chart
                 svg.selectAll(".bar")
@@ -386,83 +383,85 @@
                     .text(barProductDetails.generic_name);
             });
         }
-function builtdPieChart(currentNetCostByProduct){
-        //console.log("this is what we what to look at ", currentNetCostByProduct);
-        var svg = d3.select("body").append("svg"),
-                    width = +svg.attr("width"),
-                    height = +svg.attr("height"),
-                    radius = Math.min(width, height) / 2,
-                    g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-        var color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+        function builtdPieChart(currentNetCostByProduct) {
+            //console.log("this is what we what to look at ", currentNetCostByProduct);
+            var svg = d3.select("body").append("svg"),
+                width = +svg.attr("width"),
+                height = +svg.attr("height"),
+                radius = Math.min(width, height) / 2,
+                g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-        var pie = d3.pie()
-            .sort(null)
-            .value(function(d) { return d.manufacturer; });
+            var color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
 
-        var path = d3.arc()
-            .outerRadius(radius - 10)
-            .innerRadius(0);
+            var pie = d3.pie()
+                .sort(null)
+                .value(function(d) {
+                    return d.manufacturer_code;
+                });
 
-        var label = d3.arc()
-            .outerRadius(radius - 40)
-            .innerRadius(radius - 40);
-        
-                d3.csv("csv/r_X_csv.csv", function(d) {
+            var path = d3.arc()
+                .outerRadius(radius - 10)
+                .innerRadius(0);
+
+            var label = d3.arc()
+                .outerRadius(radius - 40)
+                .innerRadius(radius - 40);
+
+            d3.csv("csv/r_X_csv.csv", function(d) {
                 var pieChartData = [];
 
                 d.forEach(function(d) {
                     //console.log("this is d", d)
                     if (d.priority == 1) {
                         //console.log("this is the for each do", product.id);
-                       // console.log("thid is d", d);
+                        // console.log("thid is d", d);
                         pieChartData.push(d)
                     }
 
                 });
                 //console.log("pieChartData", pieChartData);
                 var pieChartArray = [];
+                var pieChartHash = {};
                 pieChartData.forEach(function(d) {
-                    var pieChartHash = {};
-                    //console.log("hash", pieChartHash)
-
-                    if(d.manufacturer in pieChartHash.manufacturer){
-                            //console.log("post-results", d.manufacturer_code)
-                            console.log("post-results", pieChartHash.manufacturer);
-                            //pieChartHash[m_code] += 1
-                    }
-                    else{
+                    if (d.manufacturer_code in pieChartHash) {
+                        //console.log("post-results", pieChartHash[d.manufacturer_code] += 1)
+                        pieChartHash[d.manufacturer_code] += 1
+                    } else {
                         //console.log("this is here", d)
-                        pieChartHash["manufacturer"] = d.manufacturer_code
-                        pieChartHash["value"] = 1
-                        
-                        };
-                        //console.log("before the push", pieChartHash)
-                    pieChartArray.push(pieChartHash)
-                        console.log("results", pieChartHash)
-                    
-                })
-                console.log("this is an array", Object.values(pieChartArray));
+                        pieChartHash[d.manufacturer_code] = 1
+                    };
 
-                 var arc = g.selectAll(".arc")
-                        .data(pie(pieChartArray))
-                        .enter().append("g")
-                        .attr("class", "arc");
 
-                    arc.append("path")
-                        .attr("d", path)
-                        .attr("fill", function(d) { 
-                            //console.log("this is what we are looking at", d)
-                            return color(d.manufacturer); });
+                });
+                console.log("results", Object.keys(pieChartHash))
+                console.log("other results", Object.values(pieChartHash))
+                console.log("this is an array", pieChartHash);
 
-                    arc.append("text")
-                        .attr("transform", function(d) { return "translate(" + label.centroid(d) + ")"; })
-                        .attr("dy", "0.35em")
-                        .text(function(d) { return d.manufacturer_code; });//console.log("this is after each do", pieChartData);
+                var arc = g.selectAll(".arc")
+                    .data(pie(pieChartArray))
+                    .enter().append("g")
+                    .attr("class", "arc");
+
+                arc.append("path")
+                    .attr("d", path)
+                    .attr("fill", function(d) {
+                        //console.log("this is what we are looking at", d)
+                        return color(d.manufacturer);
+                    });
+
+                arc.append("text")
+                    .attr("transform", function(d) {
+                        return "translate(" + label.centroid(d) + ")";
+                    })
+                    .attr("dy", "0.35em")
+                    .text(function(d) {
+                        return d.manufacturer_code;
+                    }); //console.log("this is after each do", pieChartData);
             });
 
 
-    }
+        }
     </script>
 
 </body>
