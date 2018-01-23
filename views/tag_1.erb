@@ -5,7 +5,7 @@
     .bar {
         fill: steelblue;
     }
-
+    
     <%# .toolTip {
         position: absolute;
         display: none;
@@ -16,7 +16,7 @@
         padding: 14px;
         text-align: center;
     }
-
+    
     %>div.tooltip {
         position: absolute;
         text-align: left;
@@ -29,12 +29,12 @@
         border-radius: 8px;
         pointer-events: none;
     }
-
+    
     .arc text {
         font: 10px sans-serif;
         text-anchor: middle;
     }
-
+    
     .arc path {
         stroke: #fff;
     }
@@ -240,8 +240,7 @@
                     d3.select(this).style("fill", "blue")
                     clearBarChart()
                     buildBarChart(product)
-                    //builtdPieChart(currentNetCostByProduct)
-                    //console.log("d", d);
+                    builtdPieChart(currentNetCostByProduct)
                 })
                 .on("mouseover", function(d) {
                     div.transition()
@@ -310,28 +309,25 @@
 
             d3.csv("csv/r_X_csv.csv", function(d) {
                 var barChartData = [];
-                var netCostData = []
-
+                var barNetCost = [];
                 d.forEach(function(d) {
                     if (d.id == product.id) {
                         //console.log("this is the for each do", product.id);
                         //console.log("thid id d", d);
-                        netCostData.push(parseFloat(d.net_cost));
+                        barNetCost.push(parseFloat(d.net_cost));
                         barChartData.push(d)
                     };
 
                 })
-                netCostData.shift();
+                barNetCost.shift()
                 var barProductDetails = barChartData.shift();
-                //console.log("THIS IS HERE", netCostData)
                 // console.log("this is bar data array", barChartData);
                 // console.log("tis is bar data after shift", barProductDetails)
 
                 x.domain(barChartData.map(function(d) {
                     return d.priority;
                 }));
-                y.domain([0, d3.max(netCostData)
-                ]);
+                y.domain([0, d3.max(barNetCost)]);
 
                 // append the rectangles for the bar chart
                 svg.selectAll(".bar")
@@ -394,82 +390,96 @@
                     .text(barProductDetails.generic_name);
             });
         }
-function builtdPieChart(currentNetCostByProduct){
-        //console.log("this is what we what to look at ", currentNetCostByProduct);
-        var svg = d3.select("body").append("svg"),
-                    width = +svg.attr("width"),
-                    height = +svg.attr("height"),
-                    radius = Math.min(width, height) / 2,
-                    g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-        var color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+        function builtdPieChart(currentNetCostByProduct) {
+            //console.log("this is what we what to look at ", currentNetCostByProduct);
+            var svg = d3.select("body").append("svg"),
+                width = +svg.attr("width"),
+                height = +svg.attr("height"),
+                radius = Math.min(width, height) / 2,
+                g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-        var pie = d3.pie()
-            .sort(null)
-            .value(function(d) { return d.manufacturer; });
+            var color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
 
-        var path = d3.arc()
-            .outerRadius(radius - 10)
-            .innerRadius(0);
+            var pie = d3.pie()
+                .sort(null)
+                .value(function(d) {
+                    return d.manufacturer_code;
+                });
 
-        var label = d3.arc()
-            .outerRadius(radius - 40)
-            .innerRadius(radius - 40);
-        
-                d3.csv("csv/r_X_csv.csv", function(d) {
+            var path = d3.arc()
+                .outerRadius(radius - 10)
+                .innerRadius(0);
+
+            var label = d3.arc()
+                .outerRadius(radius - 40)
+                .innerRadius(radius - 40);
+
+            d3.csv("csv/r_X_csv.csv", function(d) {
                 var pieChartData = [];
 
                 d.forEach(function(d) {
                     //console.log("this is d", d)
                     if (d.priority == 1) {
                         //console.log("this is the for each do", product.id);
-                       // console.log("thid is d", d);
+                        // console.log("thid is d", d);
                         pieChartData.push(d)
                     }
 
                 });
                 //console.log("pieChartData", pieChartData);
-                var pieChartArray = [];
+                var priorityCount = {};
                 pieChartData.forEach(function(d) {
-                    var pieChartHash = {};
-                    console.log("hash", pieChartHash)
-
-                    if(d.manufacturer in pieChartHash){
-                            console.log("post-results", d.manufacturer_code)
-                            console.log("post-results", pieChartHash[manufacturer] += 1);
-                            //pieChartHash[m_code] += 1
-                    }
-                    else{
+                    if (d.manufacturer_code in priorityCount) {
+                        //console.log("post-results", priorityCount[d.manufacturer_code] += 1)
+                        priorityCount[d.manufacturer_code] += 1
+                    } else {
                         //console.log("this is here", d)
-                        pieChartHash["manufacturer"] = d.manufacturer_code
-                        pieChartHash["value"] = 1
-                        
-                        };
+                        priorityCount[d.manufacturer_code] = 1
+                    };
+
+
+                });
+                //console.log("results", Object.keys(priorityCount))
+                //console.log("other results", Object.values(priorityCount))
+                //console.log("this is a hash", priorityCount);
+                var pieChartArray = [];
+                var pieKeys = Object.keys(priorityCount);
+                var pieValues = Object.values(priorityCount);
+                pieKeys.forEach(function(d, i) {
+                    var pieChartHash = {};
+                    //console.log(d)
+                    //console.log(pieValues[i])
+                    pieChartHash["manufacturer"] = d
+                    pieChartHash["value"] = pieValues[i]
                     pieChartArray.push(pieChartHash)
-                        console.log("results", pieChartHash)
-                    
-                })
-                console.log("this is an array", Object.values(pieChartArray));
+                });
+                console.log(pieChartArray)
 
-                 var arc = g.selectAll(".arc")
-                        .data(pie(pieChartArray))
-                        .enter().append("g")
-                        .attr("class", "arc");
+                var arc = g.selectAll(".arc")
+                    .data(pie(pieChartArray))
+                    .enter().append("g")
+                    .attr("class", "arc");
 
-                    arc.append("path")
-                        .attr("d", path)
-                        .attr("fill", function(d) { 
-                            //console.log("this is what we are looking at", d)
-                            return color(d.manufacturer); });
+                arc.append("path")
+                    .attr("d", path)
+                    .attr("fill", function(d) {
+                        //console.log("this is what we are looking at", d)
+                        return color(d.manufacturer);
+                    });
 
-                    arc.append("text")
-                        .attr("transform", function(d) { return "translate(" + label.centroid(d) + ")"; })
-                        .attr("dy", "0.35em")
-                        .text(function(d) { return d.manufacturer_code; });//console.log("this is after each do", pieChartData);
+                arc.append("text")
+                    .attr("transform", function(d) {
+                        return "translate(" + label.centroid(d) + ")";
+                    })
+                    .attr("dy", "0.35em")
+                    .text(function(d) {
+                        return d.manufacturer;
+                    }); //console.log("this is after each do", pieChartData);
             });
 
 
-    }
+        }
     </script>
 
 </body>
