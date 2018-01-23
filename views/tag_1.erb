@@ -302,15 +302,17 @@
 
             d3.csv("csv/r_X_csv.csv", function(d) {
                 var barChartData = [];
-
+                var barNetCost = [];
                 d.forEach(function(d) {
                     if (d.id == product.id) {
                         //console.log("this is the for each do", product.id);
                         //console.log("thid id d", d);
+                        barNetCost.push(parseFloat(d.net_cost));
                         barChartData.push(d)
                     };
 
                 })
+                barNetCost.shift()
                 var barProductDetails = barChartData.shift();
                 // console.log("this is bar data array", barChartData);
                 // console.log("tis is bar data after shift", barProductDetails)
@@ -318,9 +320,7 @@
                 x.domain(barChartData.map(function(d) {
                     return d.priority;
                 }));
-                y.domain([0, d3.max(barChartData, function(d) {
-                    return d.net_cost;
-                })]);
+                y.domain([0, d3.max(barNetCost)]);
 
                 // append the rectangles for the bar chart
                 svg.selectAll(".bar")
@@ -467,7 +467,7 @@
                     })
                     .attr("dy", "0.35em")
                     .text(function(d) {
-                        return d.manufacturer_code;
+                        return d.manufacturer;
                     }); //console.log("this is after each do", pieChartData);
             });
 
