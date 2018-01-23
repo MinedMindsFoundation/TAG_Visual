@@ -347,7 +347,7 @@
                         return height - y(d.net_cost);
                     })
                     .style("fill", function(d) {
-                        console.log("HERE", d)
+                        //console.log("HERE", d)
                         if (d.priority == "CURRENT #1") {
                             return "blue"
                         };
@@ -474,12 +474,14 @@
 
                     arc.append("path")
                             .attr("d", path)
-                            .attr("fill", function(d) { return color(d.value); });
+                            .attr("fill", function(d) {
+                                console.log("look at me", d)
+                                 return color(d.data.manufacturer); });
 
                     arc.append("text")
                             .attr("transform", function(d) { return "translate(" + label.centroid(d) + ")"; })
                             .attr("dy", "0.35em")
-                            .text(d.value); //console.log("this is after each do", pieChartData);
+                            .text(function(d){ return d.data.manufacturer}); //console.log("this is after each do", pieChartData);
             });
 
 
