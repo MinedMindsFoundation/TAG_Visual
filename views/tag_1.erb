@@ -19,9 +19,9 @@
     
     %>div.tooltip {
         position: absolute;
-        text-align: center;
+        text-align: left;
         width: 175px;
-        height: 100px;
+        height: 120px;
         padding: 2px;
         font: 12px sans-serif;
         background: lightsteelblue;
@@ -257,17 +257,24 @@
                     } //Bottom Right 
                 })
                 .on('click', function(product) {
+                    d3.selectAll("#numberOne").style("fill", function(d) {
+                        if (d.current_manufacturer == d.numOneManufacturer) {
+                            return "red"
+                        } else {
+                            return "green"
+                        } 
+                    })
                     d3.select(this).style("fill", "blue")
                     clearBarChart()
                     buildBarChart(product)
                     builtdPieChart(currentNetCostByProduct)
-                        //console.log("d", d);
                 })
                 .on("mouseover", function(d) {
                     div.transition()
                         .duration(200)
                         .style("opacity", .9)
-                    div.html("Product Details" + "<br>" + "Manufacturer:" + (d.numOneManufacturer) + "<br>" + "Generic Name:" + (d.generic_name) + "<br>" + "Priority:" + (d.numberOnePriority) + "<br>" + "Net Cost $" + (d.numberOneNetCost) + "<br>" + "Projected Savings $" + (d.numberOneSavings))
+                    div.html((d.generic_name) + "<br>" + "Manufacturer:" + (d.numOneManufacturer) + "<br>" + "Net Cost $" + (d.numberOneNetCost) + "<br>" + "Projected Savings $" + (d.numberOneSavings))
+                    // div.html("Product Details" + "<br>" + "Manufacturer:" + (d.numOneManufacturer) + "<br>" + "Generic Name:" + (d.generic_name) + "<br>" + "Priority:" + (d.numberOnePriority) + "<br>" + "Net Cost $" + (d.numberOneNetCost) + "<br>" + "Projected Savings $" + (d.numberOneSavings))
                         .style("left", (d3.event.pageX) + "px")
                         .style("top", (d3.event.pageY - 28) + "px");
                 })
@@ -368,7 +375,7 @@
                         div.transition()
                             .duration(200)
                             .style("opacity", .9)
-                        div.html("Product Details" + "<br>" + "Manufacturer:" + (d.manufacturer_code) + "<br>" + "Generic Name:" + (barProductDetails.generic_name) + "<br>" + "Priority:" + (d.priority) + "<br>" + "Net Cost $" + (d.net_cost) + "<br>" + "Projected Savings $" + (d.saving))
+                        div.html("Manufacturer:" + (d.manufacturer_code) + "<br>" + "Priority:" + (d.priority) + "<br>" + "Net Cost $" + (d.net_cost) + "<br>" + "Projected Savings $" + (d.saving))
                             .style("left", (d3.event.pageX) + "px")
                             .style("top", (d3.event.pageY - 28) + "px");
                     })
