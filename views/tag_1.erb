@@ -417,15 +417,39 @@ function builtdPieChart(currentNetCostByProduct){
                     }
 
                 });
-                console.log("pieChartData", pieChartData);
+                //console.log("pieChartData", pieChartData);
+                var pieChartArray = [];
+                pieChartData.forEach(function(d) {
+                    var pieChartHash = {};
+                    console.log("hash", pieChartHash)
+
+                    if(d.manufacturer_code in pieChartHash){
+                            //console.log("post-results", m_code)
+                            //console.log("post-results", pieChartHash[m_code] += 1)
+                            pieChartHash[m_code] += 1
+                    }
+                    else{
+                        //console.log("this is here", d)
+                        pieChartHash["manufacturer"] = d.manufacturer_code
+                        pieChartHash["value"] = 1
+                        pieChartArray.push(pieChartHash);
+                        };
+                    
+                        console.log("results", pieChartHash)
+                    
+                })
+                console.log("this is an array", pieChartArray);
+
                  var arc = g.selectAll(".arc")
-                        .data(pieChartData)
+                        .data(pie(pieChartHash))
                         .enter().append("g")
                         .attr("class", "arc");
 
                     arc.append("path")
                         .attr("d", path)
-                        .attr("fill", function(d) { return color(d.manufacturer_code); });
+                        .attr("fill", function(d) { 
+                            //console.log("this is what we are looking at", d)
+                            return color(d.manufacturer_code); });
 
                     arc.append("text")
                         .attr("transform", function(d) { return "translate(" + label.centroid(d) + ")"; })
