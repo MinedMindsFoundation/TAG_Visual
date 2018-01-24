@@ -50,7 +50,7 @@
 <body>
     <svg id="scatter" width="700" height="500"> </svg>
     <svg id="pieChart" width="960" height="500"></svg>
-    <svg id="barChart" width="960" height="500"></svg>
+    
     <div></div>
     <script src="http://d3js.org/d3.v4.min.js"></script>
     <script>
@@ -194,13 +194,8 @@
 
         function buildBarChart(product) {
             //console.log("d", d);
-            var svg = d3.select("#barChart"),
-                margin = {
-                    top: 20,
-                    right: 20,
-                    bottom: 30,
-                    left: 40
-                },
+            var svg = d3.select("body").append("svg"),
+                margin = {top: 20, right: 20, bottom: 30, left: 40},
                 width = +svg.attr("width") - margin.left - margin.right,
                 height = +svg.attr("height") - margin.top - margin.bottom,
                 g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
