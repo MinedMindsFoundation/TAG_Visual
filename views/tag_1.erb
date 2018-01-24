@@ -214,10 +214,10 @@
 
                 var data = stackBarChartData;
                 var margin = {
-                    top: 20,
-                    right: 20,
-                    bottom: 20,
-                    left: 20
+                    top: 10,
+                    right: 40,
+                    bottom: 40,
+                    left: 40
                 };
                 var width = 960 - margin.left - margin.right;
                 var height = 500 - margin.top - margin.bottom;
@@ -242,7 +242,7 @@
                     .range([0, width]);
                 var yScale = d3.scaleLinear()
                     .domain([0, yExtent[1]])
-                    .range([height, 0]);
+                    .range([height, 1]);
 
                 var stack = d3.stack()
                     .keys(["net_cost", "total_rebate"])
@@ -292,6 +292,19 @@
                 // add the y Axis
                 svg.append("g")
                     .call(d3.axisLeft(yScale));
+                svg.append("text")
+                    .attr("transform",
+                        "translate(" + (width / 2) + " ," +
+                        (height + margin.top + 20) + ")")
+                    .style("text-anchor", "middle")
+                    .text("Priority");
+                svg.append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 0 - margin.left)
+                    .attr("x", 0 - (height / 2))
+                    .attr("dy", "1em")
+                    .style("text-anchor", "middle")
+                    .text("Bid Price ");
 
             })
         }
