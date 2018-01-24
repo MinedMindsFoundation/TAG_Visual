@@ -80,7 +80,7 @@
             .attr("class", "tooltip")
             .style("opacity", 0);
 
-        
+
 
         d3.csv("csv/r_X_csv.csv", function(error, data) {
             // console.log("data", data)
@@ -284,6 +284,14 @@
                     .attr("id", function(d) {
                         return d.priority
                     });
+
+                // add the x Axis
+                svg.append("g")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(d3.axisBottom(xScale));
+                // add the y Axis
+                svg.append("g")
+                    .call(d3.axisLeft(yScale));
 
             })
         }
