@@ -6,6 +6,13 @@
         fill: darkgreen;
     }
     
+    rect {
+        fill: blue;
+        fill-opacity: 0.5;
+        stroke: black;
+        stroke-width: 1px;
+    }
+    
     <%# .toolTip {
         position: absolute;
         display: none;
@@ -50,7 +57,7 @@
 <body>
     <svg id="scatter" width="700" height="500"> </svg>
     <svg id="pieChart" width="960" height="500"></svg>
-    
+
     <div></div>
     <script src="http://d3js.org/d3.v4.min.js"></script>
     <script>
@@ -73,10 +80,7 @@
             .attr("class", "tooltip")
             .style("opacity", 0);
 
-        g.append("rect")
-            .attr("width", width - margin.left - margin.right)
-            .attr("height", height - margin.top - margin.bottom)
-            .attr("fill", "#F6F6F6");
+        
 
         d3.csv("csv/r_X_csv.csv", function(error, data) {
             // console.log("data", data)
@@ -193,66 +197,87 @@
         }
 
         function buildBarChart(product) {
-            console.log("d", product);
-           
-
-
-
+            //console.log("d", d);
             d3.csv("csv/r_X_csv.csv", function(d) {
-                
-                var stackBarChartData = []
-           
+                var stackBarChartData = [];
                 d.forEach(function(d) {
                     if (d.id == product.id) {
                         barChartHash = {};
-                        
                         barChartHash["priority"] = d.priority;
                         barChartHash["net_cost"] = parseFloat(d.net_cost);
-                        barChartHash["bid_price"] = parseFloat(d.bid_price);
+                        barChartHash["total_rebate"] = parseFloat(d.total_rebate);
                         stackBarChartData.push(barChartHash);
                     };
-
                 })
-                stackBarChartData.shift()
-               stackBarChartData.forEach(function(d, i, columns) {
-                for (var i = 1, n = columns.length; i < n; ++i) d[columns[i]] = +d[columns[i]];
-                    console.log("this is what you are looking at", d)
-                    return d;
-               })
+                stackBarChartData.shift();
+                console.log(stackBarChartData);
 
-            });
+                var data = stackBarChartData;
+                var margin = {
+                    top: 20,
+                    right: 20,
+                    bottom: 20,
+                    left: 20
+                };
+                var width = 960 - margin.left - margin.right;
+                var height = 500 - margin.top - margin.bottom;
+                var svg = d3.select("body").append("svg")
+                    .attr("id", "barChart")
+                    .attr("width", width + margin.left + margin.bottom)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
 
-            // add the x Axis
-            //     svg.append("g")
-            //         .attr("transform", "translate(0," + height + ")")
-            //         .call(d3.axisBottom(x));
+                // min/max
+                var xExtent;
+                var yExtent = d3.extent(data, function(d) {
+                    return d.net_cost + d.total_rebate
+                });
 
-            //     // add the y Axis
-            //     svg.append("g")
-            //         .call(d3.axisLeft(y));
+                // domain
+                var xScale = d3.scaleBand()
+                    .domain(data.map(function(d) {
+                        return d.priority;
+                    }))
+                    .range([0, width]);
+                var yScale = d3.scaleLinear()
+                    .domain([0, yExtent[1]])
+                    .range([height, 0]);
 
-            //     svg.append("text")
-            //         .attr("transform",
-            //             "translate(" + (width / 2) + " ," +
-            //             (height + margin.top + 20) + ")")
-            //         .style("text-anchor", "middle")
-            //         .text("Priority");
-            //     svg.append("text")
-            //         .attr("transform", "rotate(-90)")
-            //         .attr("y", 0 - margin.left)
-            //         .attr("x", 0 - (height / 2))
-            //         .attr("dy", "1em")
-            //         .style("text-anchor", "middle")
-            //         .text("Net Cost");
+                var stack = d3.stack()
+                    .keys(["net_cost", "total_rebate"])
+                    .order(d3.stackOrderNone)
+                    .offset(d3.stackOffsetNone);
 
-            //     svg.append("text")
-            //         .attr("x", (width / 2))
-            //         .attr("y", 0 - (margin.top / 2))
-            //         .attr("text-anchor", "middle")
-            //         .style("font-size", "16px")
-            //         .style("text-decoration", "underline")
-            //         .text(barProductDetails.generic_name);
-            // });
+                var series = stack(data);
+
+                var groups = svg.selectAll("g")
+                    .data(stack(data))
+                    .enter()
+                    .append("g");
+
+                var rects = groups.selectAll("rect")
+                    .data(function(d) {
+                        return d
+                    })
+                    .enter()
+                    .append("rect")
+                    .attr("x", function(d) {
+                        return xScale(d.data.priority)
+                    })
+                    .attr("y", function(d) {
+                        return yScale(d[1])
+                    })
+                    //.style("class", ".rect1")
+                    .attr("width", xScale.bandwidth())
+                    .attr("height", function(d) {
+                        return height + yScale(d[0])
+                    })
+                    .attr("id", function(d) {
+                        return d.priority
+                    });
+
+            })
         }
 
         function builtdPieChart(currentNetCostByProduct) {
@@ -343,7 +368,7 @@
             });
 
 
-        }
+        };
     </script>
 
 </body>
