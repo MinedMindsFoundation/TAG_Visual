@@ -13,18 +13,17 @@
         stroke-width: 1px;
     } %>
     
-    <%# .toolTip {
-        position: absolute;
-        display: none;
-        min-width: 80px;
-        height: auto;
-        background: none repeat scroll 0 0 #ffffff;
-        border: 1px solid #6F257F;
-        padding: 14px;
-        text-align: center;
-    }
+    #tooltip {
+    background-color: rgba(187, 187, 187, 0.7);
+    border-radius: 5px;
+    height: 18px;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    text-align: center;
+  }
     
-    %>div.tooltip {
+    <%# div.tooltip {
         position: absolute;
         text-align: left;
         width: 175px;
@@ -35,7 +34,7 @@
         border: 0px;
         border-radius: 8px;
         pointer-events: none;
-    }
+    } %>
     
     .arc text {
         font: 10px sans-serif;
@@ -95,6 +94,9 @@
             });
             var data = currentNetCostByProduct;
             console.log(data)
+            var tooltip = d3.select('body').append('div')
+                .attr('id', 'tooltip');
+
             var margin = {
                 top: 20,
                 right: 20,
@@ -103,9 +105,7 @@
             };
             width = 900 - margin.left - margin.right,
                 height = 480 - margin.top - margin.bottom;
-            var tooltip = d3.select("body").append("div")
-                .attr("class", "tooltip")
-                .style("opacity", 0);
+            
             var x = d3.scaleLinear()
                 .range([0, width])
                 .nice();
@@ -119,7 +119,7 @@
                 ]).on("end", brushended),
                 idleTimeout,
                 idleDelay = 350;
-            var svg = d3.select("#scatter")
+            var svg = d3.select("#scatter").append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
                 .append("g")
@@ -160,7 +160,21 @@
                     return y(parseFloat(d.unitSold));
                 })
                 .attr("opacity", 0.5)
-                .style("fill", "#4292c6");
+                .style("fill", "#4292c6")
+                .on('mouseover', function(d) {
+                     tooltip.transition()
+                            .duration(100)
+                            .style('opacity', .9);
+                    tooltip.text(`text here`)
+                            .style('left', `${d3.event.pageX + 2}px`)
+                            .style('top', `${d3.event.pageY - 18}px`);
+                 })
+                .on('mouseout', function(d) {
+                     tooltip.transition()
+                            .duration(400)
+                                .style('opacity', 0);
+                });
+                
             // x axis
             svg.append("g")
                 .attr("class", "x axis")
@@ -171,7 +185,7 @@
                 .style("text-anchor", "end")
                 .attr("x", width)
                 .attr("y", height - 8)
-                .text("X Label");
+                .text("Savings");
             // y axis
             svg.append("g")
                 .attr("class", "y axis")
@@ -182,7 +196,7 @@
                 .attr("y", 6)
                 .attr("dy", "1em")
                 .style("text-anchor", "end")
-                .text("Y Label");
+                .text("Units Sold");
             scatter.append("g")
                 .attr("class", "brush")
                 .call(brush);
@@ -458,3 +472,127 @@
 </body>
 
 </html>
+
+<%# //var svg = d3.select("#scatter"),
+            margin = {
+                top: 20,
+                right: 20,
+                bottom: 30,
+                left: 50
+            },
+            width = +svg.attr("width"),
+            height = +svg.attr("height"),
+            domainwidth = width - margin.left - margin.right,
+            domainheight = height - margin.top - margin.bottom;
+
+        var g = svg.append("g")
+            .attr("transform", "translate(" + margin.top + "," + margin.top + ")");
+
+        var div = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+
+
+        d3.csv("csv/r_X_csv.csv", function(error, data) {
+            // console.log("data", data)
+
+            var unitSoldArray = [];
+            var savingsArray = [];
+            var productDetails = {};
+            var currentNetCostByProduct = [];
+            data.forEach(function(d) {
+
+                if (d.generic_name != "") {
+                    productDetails["id"] = (d.id);
+                    productDetails["generic_name"] = (d.generic_name);
+                    productDetails["unitSold"] = (d.rolling_yearly_usage);
+                    unitSoldArray.push(parseFloat(d.rolling_yearly_usage));
+                    // currentNetCostByProduct.push(productDetails);
+                };
+                if (d.priority == "CURRENT #1") {
+                    productDetails["current_manufacturer"] = (d.manufacturer_code);
+                    productDetails["currentNuberOneNetCost"] = (d.net_cost);
+                    productDetails["currrentNumberOneSavings"] = (0);
+                    productDetails["currentNumberOnePriority"] = (d.priority);
+
+                };
+                if (d.priority == 1) {
+                    productDetails["numOneManufacturer"] = (d.manufacturer_code);
+                    productDetails["numberOneNetCost"] = (d.net_cost);
+                    productDetails["numberOneSavings"] = (d.saving);
+                    productDetails["numberOnePriority"] = (d.priority);
+                    currentNetCostByProduct.push(productDetails);
+                    savingsArray.push(parseFloat(d.saving));
+                    productDetails = {};
+                };
+            });
+            console.log("currentNetCostByProduct", currentNetCostByProduct);
+
+            var x = d3.scaleLinear()
+                .domain(padExtent([-d3.max(savingsArray), d3.max(savingsArray)]))
+                .range([0, domainwidth]);
+            var y = d3.scaleLinear()
+                .domain(padExtent([0, d3.max(unitSoldArray)]))
+                .range([domainheight, 0]);
+
+
+
+            g.selectAll("#numberOne")
+                .data(currentNetCostByProduct)
+                .enter().append("circle")
+                .attr("id", "numberOne")
+                .attr("class", "dot")
+                .attr("r", 7)
+                .attr("cx", function(d) {
+                    return x(d.numberOneSavings);
+                })
+                .attr("cy", function(d) {
+                    return y(d.unitSold);
+                })
+                .style("fill", function(d) {
+                    if (d.current_manufacturer == d.numOneManufacturer) {
+                        return "red"
+                    } else {
+                        return "green"
+                    } //Bottom Right 
+                })
+                .on('click', function(product) {
+                    d3.selectAll("#numberOne").style("fill", function(d) {
+                        if (d.current_manufacturer == d.numOneManufacturer) {
+                            return "red"
+                        } else {
+                            return "green"
+                        }
+                    })
+                    d3.select(this).style("fill", "blue")
+                    clearBarChart()
+                    buildBarChart(product)
+                    builtdPieChart(currentNetCostByProduct)
+                })
+                .on("mouseover", function(d) {
+                    div.transition()
+                        .duration(200)
+                        .style("opacity", .9)
+                    div.html((d.generic_name) + "<br>" + "Manufacturer:" + (d.numOneManufacturer) + "<br>" + "Net Cost $" + (d.numberOneNetCost) + "<br>" + "Projected Savings $" + (d.numberOneSavings))
+                        // div.html("Product Details" + "<br>" + "Manufacturer:" + (d.numOneManufacturer) + "<br>" + "Generic Name:" + (d.generic_name) + "<br>" + "Priority:" + (d.numberOnePriority) + "<br>" + "Net Cost $" + (d.numberOneNetCost) + "<br>" + "Projected Savings $" + (d.numberOneSavings))
+                        .style("left", (d3.event.pageX) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px");
+                })
+                .on("mouseout", function(d) {
+                    div.transition()
+                        .duration(500)
+                        .style("opacity", 0);
+                });
+
+
+            g.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + y.range()[0] / 1 + ")")
+                .call(d3.axisBottom(x).ticks(10));
+
+             g.append("g")
+                .attr("class", "y axis")
+                .call(d3.axisRight(y).ticks(10));
+
+        }); %>
