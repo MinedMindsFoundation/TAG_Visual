@@ -18,6 +18,19 @@
         border-radius: 8px;
         pointer-events: none;
     }
+
+     div.tooltip {
+        position: absolute;
+        text-align: left;
+        width: 175px;
+        height: 120px;
+        padding: 2px;
+        font: 12px sans-serif;
+        background: lightsteelblue;
+        border: 0px;
+        border-radius: 8px;
+        pointer-events: none;
+    }
     
     .arc text {
         font: 10px sans-serif;
@@ -40,7 +53,7 @@
     <svg id="scatter" width="700" height="500"> </svg>
     <svg id="pieChart" width="960" height="500"></svg>
 
-    <div></div>
+    
     <script src="http://d3js.org/d3.v4.min.js"></script>
     <script>
         // Create data
@@ -254,6 +267,8 @@
                 stackBarChartData.shift();
                 console.log(stackBarChartData);
                 var data = stackBarChartData;
+                 var tooltip = d3.select('body').append('div')
+                .attr('id', 'tooltip');
                 var margin = {
                     top: 20,
                     right: 20,
@@ -347,7 +362,7 @@
                     .style("stroke", "black")
                     .style("stroke-width", "1px")
                     .on("mouseover", function(d) {
-                        div.transition()
+                        tooltip.transition()
                             .duration(200)
                             .style("opacity", .9)
                         tooltip.html("Manufacturer:" + (d.data.manufacturer_code) + "<br>" + "Net Cost $" + (d.data.net_cost) + "<br>" + "Total Rebate $" + (d.data.total_rebate) + "<br>" + "Bid Price $" + (round(d.data.net_cost + d.data.total_rebate, 2)))
