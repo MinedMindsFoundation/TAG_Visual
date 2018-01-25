@@ -6,14 +6,7 @@
         fill: darkgreen;
     }
     
-    <%# rect {
-        fill: blue;
-        fill-opacity: 0.5;
-        stroke: black;
-        stroke-width: 1px;
-    } %>
-    
-    #tooltip  {
+    #tooltip {
         position: absolute;
         text-align: left;
         width: 175px;
@@ -25,8 +18,6 @@
         border-radius: 8px;
         pointer-events: none;
     }
-    
-     
     
     .arc text {
         font: 10px sans-serif;
@@ -52,8 +43,7 @@
     <div></div>
     <script src="http://d3js.org/d3.v4.min.js"></script>
     <script>
-    
-  // Create data
+        // Create data
         d3.csv("csv/r_X_csv.csv", function(error, data) {
             // console.log("data", data)
             var unitSoldArray = [];
@@ -97,7 +87,7 @@
             };
             width = 900 - margin.left - margin.right,
                 height = 480 - margin.top - margin.bottom;
-            
+
             var x = d3.scaleLinear()
                 .range([0, width])
                 .nice();
@@ -141,7 +131,7 @@
             scatter.append("g")
                 .attr("class", "brush")
                 .call(brush);
-            
+
             scatter.selectAll(".dot")
                 .data(data)
                 .enter().append("circle")
@@ -158,17 +148,17 @@
                 .attr("opacity", 0.5)
                 .style("fill", "#4292c6")
                 .on('mouseover', function(d) {
-                     tooltip.transition()
-                            .duration(100)
-                            .style('opacity', .9);
+                    tooltip.transition()
+                        .duration(100)
+                        .style('opacity', .9);
                     tooltip.html((d.generic_name) + "<br>" + "Manufacturer:" + (d.numOneManufacturer) + "<br>" + "Net Cost $" + (d.numberOneNetCost) + "<br>" + "Projected Savings $" + (d.numberOneSavings))
-                            .style('left', `${d3.event.pageX + 2}px`)
-                            .style('top', `${d3.event.pageY - 18}px`);
-                 })
+                        .style('left', `${d3.event.pageX + 2}px`)
+                        .style('top', `${d3.event.pageY - 18}px`);
+                })
                 .on('mouseout', function(d) {
-                     tooltip.transition()
-                            .duration(400)
-                                .style('opacity', 0);
+                    tooltip.transition()
+                        .duration(400)
+                        .style('opacity', 0);
                 })
                 .on('click', function(product) {
                     d3.select(this).style("fill", "blue")
@@ -176,7 +166,7 @@
                     buildBarChart(product)
                     builtdPieChart(currentNetCostByProduct)
                 })
-                
+
             // x axis
             svg.append("g")
                 .attr("class", "x axis")
@@ -199,7 +189,7 @@
                 .attr("dy", "1em")
                 .style("text-anchor", "end")
                 .text("Units Sold");
-            
+
             function brushended() {
                 var s = d3.event.selection;
                 if (!s) {
@@ -217,9 +207,11 @@
                 }
                 zoom();
             }
+
             function idled() {
                 idleTimeout = null;
             }
+
             function zoom() {
                 var t = scatter.transition().duration(750);
                 svg.select("#axis--x").transition(t).call(xAxis);
@@ -233,7 +225,7 @@
                     });
             }
         });
-    
+
 
         function clearBarChart() {
             d3.select("#barChart").remove()
@@ -276,6 +268,7 @@
                     .attr("height", height + margin.top + margin.bottom)
                     .append("g")
                     .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
+
                 function round(value, decimals) {
                     return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
                 };
@@ -350,8 +343,11 @@
                             return "blue"
                         }
                     })
-                    .on('mouseover', function(d) {
-                        tooltip.transition()
+                    .style("fill-opacity", "0.5")
+                    .style("stroke", "black")
+                    .style("stroke-width", "1px")
+                    .on("mouseover", function(d) {
+                        div.transition()
                             .duration(200)
                             .style("opacity", .9)
                         tooltip.html("Manufacturer:" + (d.data.manufacturer_code) + "<br>" + "Net Cost $" + (d.data.net_cost) + "<br>" + "Total Rebate $" + (d.data.total_rebate) + "<br>" + "Bid Price $" + (round(d.data.net_cost + d.data.total_rebate, 2)))
@@ -446,7 +442,7 @@
                     .data(pie(pieChartArray))
                     .enter().append("g")
                     .attr("class", "arc")
-                    
+
 
                 arc.append("path")
                     .attr("d", path)
