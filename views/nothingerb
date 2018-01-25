@@ -1,0 +1,127 @@
+<html>
+<script>
+var svg = d3.select("#scatter"),
+            margin = {
+                top: 20,
+                right: 20,
+                bottom: 30,
+                left: 50
+            },
+            width = +svg.attr("width"),
+            height = +svg.attr("height"),
+            domainwidth = width - margin.left - margin.right,
+            domainheight = height - margin.top - margin.bottom;
+
+        var g = svg.append("g")
+            .attr("transform", "translate(" + margin.top + "," + margin.top + ")");
+
+        var div = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+
+
+        d3.csv("csv/r_X_csv.csv", function(error, data) {
+            // console.log("data", data)
+
+            var unitSoldArray = [];
+            var savingsArray = [];
+            var productDetails = {};
+            var currentNetCostByProduct = [];
+            data.forEach(function(d) {
+
+                if (d.generic_name != "") {
+                    productDetails["id"] = (d.id);
+                    productDetails["generic_name"] = (d.generic_name);
+                    productDetails["unitSold"] = (d.rolling_yearly_usage);
+                    unitSoldArray.push(parseFloat(d.rolling_yearly_usage));
+                    // currentNetCostByProduct.push(productDetails);
+                };
+                if (d.priority == "CURRENT #1") {
+                    productDetails["current_manufacturer"] = (d.manufacturer_code);
+                    productDetails["currentNuberOneNetCost"] = (d.net_cost);
+                    productDetails["currrentNumberOneSavings"] = (0);
+                    productDetails["currentNumberOnePriority"] = (d.priority);
+
+                };
+                if (d.priority == 1) {
+                    productDetails["numOneManufacturer"] = (d.manufacturer_code);
+                    productDetails["numberOneNetCost"] = (d.net_cost);
+                    productDetails["numberOneSavings"] = (d.saving);
+                    productDetails["numberOnePriority"] = (d.priority);
+                    currentNetCostByProduct.push(productDetails);
+                    savingsArray.push(parseFloat(d.saving));
+                    productDetails = {};
+                };
+            });
+            console.log("currentNetCostByProduct", currentNetCostByProduct);
+
+            var x = d3.scaleLinear()
+                .domain(padExtent([-d3.max(savingsArray), d3.max(savingsArray)]))
+                .range([0, domainwidth]);
+            var y = d3.scaleLinear()
+                .domain(padExtent([0, d3.max(unitSoldArray)]))
+                .range([domainheight, 0]);
+
+
+
+            g.selectAll("#numberOne")
+                .data(currentNetCostByProduct)
+                .enter().append("circle")
+                .attr("id", "numberOne")
+                .attr("class", "dot")
+                .attr("r", 7)
+                .attr("cx", function(d) {
+                    return x(d.numberOneSavings);
+                })
+                .attr("cy", function(d) {
+                    return y(d.unitSold);
+                })
+                .style("fill", function(d) {
+                    if (d.current_manufacturer == d.numOneManufacturer) {
+                        return "red"
+                    } else {
+                        return "green"
+                    } //Bottom Right 
+                })
+                .on('click', function(product) {
+                    d3.selectAll("#numberOne").style("fill", function(d) {
+                        if (d.current_manufacturer == d.numOneManufacturer) {
+                            return "red"
+                        } else {
+                            return "green"
+                        }
+                    })
+                    d3.select(this).style("fill", "blue")
+                    clearBarChart()
+                    buildBarChart(product)
+                    builtdPieChart(currentNetCostByProduct)
+                })
+                .on("mouseover", function(d) {
+                    div.transition()
+                        .duration(200)
+                        .style("opacity", .9)
+                    div.html((d.generic_name) + "<br>" + "Manufacturer:" + (d.numOneManufacturer) + "<br>" + "Net Cost $" + (d.numberOneNetCost) + "<br>" + "Projected Savings $" + (d.numberOneSavings))
+                        // div.html("Product Details" + "<br>" + "Manufacturer:" + (d.numOneManufacturer) + "<br>" + "Generic Name:" + (d.generic_name) + "<br>" + "Priority:" + (d.numberOnePriority) + "<br>" + "Net Cost $" + (d.numberOneNetCost) + "<br>" + "Projected Savings $" + (d.numberOneSavings))
+                        .style("left", (d3.event.pageX) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px");
+                })
+                .on("mouseout", function(d) {
+                    div.transition()
+                        .duration(500)
+                        .style("opacity", 0);
+                });
+
+
+            g.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + y.range()[0] / 1 + ")")
+                .call(d3.axisBottom(x).ticks(10));
+
+             g.append("g")
+                .attr("class", "y axis")
+                .call(d3.axisRight(y).ticks(10));
+
+        });
+        </script>
+        </html>

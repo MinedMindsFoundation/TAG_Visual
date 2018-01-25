@@ -6,12 +6,12 @@
         fill: darkgreen;
     }
     
-    rect {
+    <%# rect {
         fill: blue;
         fill-opacity: 0.5;
         stroke: black;
         stroke-width: 1px;
-    }
+    } %>
     
     <%# .toolTip {
         position: absolute;
@@ -61,36 +61,15 @@
     <div></div>
     <script src="http://d3js.org/d3.v4.min.js"></script>
     <script>
-        var svg = d3.select("#scatter"),
-            margin = {
-                top: 20,
-                right: 20,
-                bottom: 30,
-                left: 50
-            },
-            width = +svg.attr("width"),
-            height = +svg.attr("height"),
-            domainwidth = width - margin.left - margin.right,
-            domainheight = height - margin.top - margin.bottom;
-
-        var g = svg.append("g")
-            .attr("transform", "translate(" + margin.top + "," + margin.top + ")");
-
-        var div = d3.select("body").append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 0);
-
-
-
+    
+  // Create data
         d3.csv("csv/r_X_csv.csv", function(error, data) {
             // console.log("data", data)
-
             var unitSoldArray = [];
             var savingsArray = [];
             var productDetails = {};
             var currentNetCostByProduct = [];
             data.forEach(function(d) {
-
                 if (d.generic_name != "") {
                     productDetails["id"] = (d.id);
                     productDetails["generic_name"] = (d.generic_name);
@@ -103,7 +82,6 @@
                     productDetails["currentNuberOneNetCost"] = (d.net_cost);
                     productDetails["currrentNumberOneSavings"] = (0);
                     productDetails["currentNumberOnePriority"] = (d.priority);
-
                 };
                 if (d.priority == 1) {
                     productDetails["numOneManufacturer"] = (d.manufacturer_code);
@@ -115,76 +93,133 @@
                     productDetails = {};
                 };
             });
-            console.log("currentNetCostByProduct", currentNetCostByProduct);
-
+            var data = currentNetCostByProduct;
+            console.log(data)
+            var margin = {
+                top: 20,
+                right: 20,
+                bottom: 30,
+                left: 30
+            };
+            width = 900 - margin.left - margin.right,
+                height = 480 - margin.top - margin.bottom;
+            var tooltip = d3.select("body").append("div")
+                .attr("class", "tooltip")
+                .style("opacity", 0);
             var x = d3.scaleLinear()
-                .domain(padExtent([-d3.max(savingsArray), d3.max(savingsArray)]))
-                .range([0, domainwidth]);
+                .range([0, width])
+                .nice();
             var y = d3.scaleLinear()
-                .domain(padExtent([0, d3.max(unitSoldArray)]))
-                .range([domainheight, 0]);
-
-
-
-            g.selectAll("#numberOne")
-                .data(currentNetCostByProduct)
+                .range([height, 0]);
+            var xAxis = d3.axisBottom(x).ticks(12),
+                yAxis = d3.axisLeft(y).ticks(12 * height / width);
+            var brush = d3.brush().extent([
+                    [0, 0],
+                    [width, height]
+                ]).on("end", brushended),
+                idleTimeout,
+                idleDelay = 350;
+            var svg = d3.select("#scatter")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            var clip = svg.append("defs").append("svg:clipPath")
+                .attr("id", "clip")
+                .append("svg:rect")
+                .attr("width", width)
+                .attr("height", height)
+                .attr("x", 0)
+                .attr("y", 0);
+            var xExtent = d3.extent(savingsArray, function(d) {
+                return d;
+            });
+            var yExtent = d3.extent(unitSoldArray, function(d) {
+                return d;
+            });
+            x.domain(d3.extent(savingsArray, function(d) {
+                return d;
+            })).nice();
+            y.domain(d3.extent(unitSoldArray, function(d) {
+                return d;
+            })).nice();
+            var scatter = svg.append("g")
+                .attr("id", "scatterplot")
+                .attr("clip-path", "url(#clip)");
+            scatter.selectAll(".dot")
+                .data(data)
                 .enter().append("circle")
-                .attr("id", "numberOne")
                 .attr("class", "dot")
-                .attr("r", 7)
+                .attr("r", 4)
                 .attr("cx", function(d) {
-                    return x(d.numberOneSavings);
+                    console.log("x d", d);
+                    console.log("xD", x(d.numberOneSavings))
+                    return x(parseFloat(d.numberOneSavings));
                 })
                 .attr("cy", function(d) {
-                    return y(d.unitSold);
+                    return y(parseFloat(d.unitSold));
                 })
-                .style("fill", function(d) {
-                    if (d.current_manufacturer == d.numOneManufacturer) {
-                        return "red"
-                    } else {
-                        return "green"
-                    } //Bottom Right 
-                })
-                .on('click', function(product) {
-                    d3.selectAll("#numberOne").style("fill", function(d) {
-                        if (d.current_manufacturer == d.numOneManufacturer) {
-                            return "red"
-                        } else {
-                            return "green"
-                        }
-                    })
-                    d3.select(this).style("fill", "blue")
-                    clearBarChart()
-                    buildBarChart(product)
-                    builtdPieChart(currentNetCostByProduct)
-                })
-                .on("mouseover", function(d) {
-                    div.transition()
-                        .duration(200)
-                        .style("opacity", .9)
-                    div.html((d.generic_name) + "<br>" + "Manufacturer:" + (d.numOneManufacturer) + "<br>" + "Net Cost $" + (d.numberOneNetCost) + "<br>" + "Projected Savings $" + (d.numberOneSavings))
-                        // div.html("Product Details" + "<br>" + "Manufacturer:" + (d.numOneManufacturer) + "<br>" + "Generic Name:" + (d.generic_name) + "<br>" + "Priority:" + (d.numberOnePriority) + "<br>" + "Net Cost $" + (d.numberOneNetCost) + "<br>" + "Projected Savings $" + (d.numberOneSavings))
-                        .style("left", (d3.event.pageX) + "px")
-                        .style("top", (d3.event.pageY - 28) + "px");
-                })
-                .on("mouseout", function(d) {
-                    div.transition()
-                        .duration(500)
-                        .style("opacity", 0);
-                });
-
-
-            g.append("g")
+                .attr("opacity", 0.5)
+                .style("fill", "#4292c6");
+            // x axis
+            svg.append("g")
                 .attr("class", "x axis")
-                .attr("transform", "translate(0," + y.range()[0] / 1 + ")")
-                .call(d3.axisBottom(x).ticks(5));
-
-            g.append("g")
+                .attr('id', "axis--x")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis);
+            svg.append("text")
+                .style("text-anchor", "end")
+                .attr("x", width)
+                .attr("y", height - 8)
+                .text("X Label");
+            // y axis
+            svg.append("g")
                 .attr("class", "y axis")
-                .attr("transform", "translate(" + x.range()[0] / 2 + ", 0)")
-                .call(d3.axisRight(y).ticks(5));
-
+                .attr('id', "axis--y")
+                .call(yAxis);
+            svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("dy", "1em")
+                .style("text-anchor", "end")
+                .text("Y Label");
+            scatter.append("g")
+                .attr("class", "brush")
+                .call(brush);
+            function brushended() {
+                var s = d3.event.selection;
+                if (!s) {
+                    if (!idleTimeout) return idleTimeout = setTimeout(idled, idleDelay);
+                    x.domain(d3.extent(data, function(d) {
+                        return parseFloat(d.numberOneSavings);
+                    })).nice();
+                    y.domain(d3.extent(data, function(d) {
+                        return parseFloat(d.unitSold);
+                    })).nice();
+                } else {
+                    x.domain([s[0][0], s[1][0]].map(x.invert, x));
+                    y.domain([s[1][1], s[0][1]].map(y.invert, y));
+                    scatter.select(".brush").call(brush.move, null);
+                }
+                zoom();
+            }
+            function idled() {
+                idleTimeout = null;
+            }
+            function zoom() {
+                var t = scatter.transition().duration(750);
+                svg.select("#axis--x").transition(t).call(xAxis);
+                svg.select("#axis--y").transition(t).call(yAxis);
+                scatter.selectAll("circle").transition(t)
+                    .attr("cx", function(d) {
+                        return x(parseFloat(d.numberOneSavings));
+                    })
+                    .attr("cy", function(d) {
+                        return y(parseFloat(d.unitSold));
+                    });
+            }
         });
+    
 
         function clearBarChart() {
             d3.select("#barChart").remove()
@@ -199,10 +234,12 @@
         function buildBarChart(product) {
             //console.log("d", d);
             d3.csv("csv/r_X_csv.csv", function(d) {
+                console.log("this is the data", d)
                 var stackBarChartData = [];
                 d.forEach(function(d) {
                     if (d.id == product.id) {
                         barChartHash = {};
+                        barChartHash["manufacturer_code"] = d.manufacturer_code
                         barChartHash["priority"] = d.priority;
                         barChartHash["net_cost"] = parseFloat(d.net_cost);
                         barChartHash["total_rebate"] = parseFloat(d.total_rebate);
@@ -229,8 +266,9 @@
                     .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
 
                 // min/max
-                var xExtent;
+                
                 var yExtent = d3.extent(data, function(d) {
+                    console.log("data", d)
                     return d.net_cost + d.total_rebate
                 });
 
@@ -242,14 +280,15 @@
                     .range([0, width]);
                 var yScale = d3.scaleLinear()
                     .domain([0, yExtent[1]])
-                    .range([height, 1]);
+                    .range([height, 0]);
 
                 var stack = d3.stack()
                     .keys(["net_cost", "total_rebate"])
                     .order(d3.stackOrderNone)
                     .offset(d3.stackOffsetNone);
 
-                var series = stack(data);
+                var series = stack(data)
+                //console.log("this is what im need to see",data);
 
                 var groups = svg.selectAll("g")
                     .data(stack(data))
@@ -261,11 +300,12 @@
 
                     svg.append("g")
                     .attr("transform", "translate(0," + height + ")")
-                    .call(d3.axisBottom(xScale));
+                  
                     
 
                 var rects = groups.selectAll("rect")
                     .data(function(d) {
+                        console.log("this is what i looking for:", d)
                         return d
                     })
                     .enter()
@@ -274,30 +314,38 @@
                         return xScale(d.data.priority)
                     })
                     .attr("y", function(d) {
+                        //console.log("this is what you rlooking at:", d)
                         return yScale(d[1])
                     })
                     //.style("class", ".rect1")
                     .attr("width", xScale.bandwidth())
                     .attr("height", function(d) {
+                        //console.log("look at this next:", d)
                         return height + yScale(d[0])
                     })
-                    .attr("id", function(d) {
-                        return d.priority
+                    
+                    .on("mouseover", function(d) {
+                            div.transition()
+                                .duration(200)
+                                .style("opacity", .9)
+                            div.html("Manufacturer:" + (d.data.manufacturer_code) + "<br>" + "Net Cost $" + (d.data.net_cost) + "<br>" + "Total Rebate $" + (d.data.total_rebate) + "<br>" + "Bid Price $")
+                                // div.html("Product Details" + "<br>" + "Manufacturer:" + (d.numOneManufacturer) + "<br>" + "Generic Name:" + (d.generic_name) + "<br>" + "Priority:" + (d.numberOnePriority) + "<br>" + "Net Cost $" + (d.numberOneNetCost) + "<br>" + "Projected Savings $" + (d.numberOneSavings))
+                                .style("left", (d3.event.pageX) + "px")
+                                .style("top", (d3.event.pageY - 28) + "px");
+                        })
+                    .on("mouseout", function(d) {
+                            div.transition()
+                                .duration(500)
+                                .style("opacity", 0);
                     });
 
                 // add the x Axis
-                svg.append("g")
-                    .attr("transform", "translate(0," + height + ")")
-                    .call(d3.axisBottom(xScale));
+               
                 // add the y Axis
                 svg.append("g")
+                    .attr("class", "y axis")
                     .call(d3.axisLeft(yScale));
-                svg.append("text")
-                    .attr("transform",
-                        "translate(" + (width / 2) + " ," +
-                        (height + margin.top + 20) + ")")
-                    .style("text-anchor", "middle")
-                    .text("Priority");
+                
                 svg.append("text")
                     .attr("transform", "rotate(-90)")
                     .attr("y", 0 - margin.left)
@@ -377,7 +425,8 @@
                 var arc = g.selectAll(".arc")
                     .data(pie(pieChartArray))
                     .enter().append("g")
-                    .attr("class", "arc");
+                    .attr("class", "arc")
+                    
 
                 arc.append("path")
                     .attr("d", path)
