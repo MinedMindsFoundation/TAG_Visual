@@ -234,12 +234,11 @@
         function buildBarChart(product) {
             //console.log("d", d);
             d3.csv("csv/r_X_csv.csv", function(d) {
-                console.log("this is the data", d)
                 var stackBarChartData = [];
                 d.forEach(function(d) {
                     if (d.id == product.id) {
                         barChartHash = {};
-                        barChartHash["manufacturer_code"] = d.manufacturer_code
+                        barChartHash["manufacturer_code"] = d.manufacturer_code;
                         barChartHash["priority"] = d.priority;
                         barChartHash["net_cost"] = parseFloat(d.net_cost);
                         barChartHash["total_rebate"] = parseFloat(d.total_rebate);
@@ -248,13 +247,12 @@
                 })
                 stackBarChartData.shift();
                 console.log(stackBarChartData);
-
                 var data = stackBarChartData;
                 var margin = {
-                    top: 10,
-                    right: 40,
-                    bottom: 40,
-                    left: 40
+                    top: 20,
+                    right: 20,
+                    bottom: 20,
+                    left: 20
                 };
                 var width = 960 - margin.left - margin.right;
                 var height = 500 - margin.top - margin.bottom;
@@ -264,14 +262,21 @@
                     .attr("height", height + margin.top + margin.bottom)
                     .append("g")
                     .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
-
+                function round(value, decimals) {
+                    return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+                };
                 // min/max
-                
+                var xExtent;
                 var yExtent = d3.extent(data, function(d) {
-                    console.log("data", d)
-                    return d.net_cost + d.total_rebate
+                    //console.log("Net_C", d.net_cost);
+                    //console.log("rebate", d.total_rebate);
+                    //console.log(d.net_cost + d.total_rebate);
+                    var nicer = d.net_cost + d.total_rebate;
+                    //console.log("THIS", round(nicer, 2));
+                    return round(nicer, 2)
                 });
-
+                //console.log("heigh", height)
+                //console.log("y", yExtent)
                 // domain
                 var xScale = d3.scaleBand()
                     .domain(data.map(function(d) {
@@ -281,31 +286,22 @@
                 var yScale = d3.scaleLinear()
                     .domain([0, yExtent[1]])
                     .range([height, 0]);
-
+                var x = d3.scaleBand()
+                    .domain(data.map(function(d) {
+                        return d.priority;
+                    }))
+                    .range([0, width]);
                 var stack = d3.stack()
                     .keys(["net_cost", "total_rebate"])
                     .order(d3.stackOrderNone)
                     .offset(d3.stackOffsetNone);
-
-                var series = stack(data)
-                //console.log("this is what im need to see",data);
-
+                var series = stack(data);
                 var groups = svg.selectAll("g")
                     .data(stack(data))
                     .enter()
                     .append("g");
-                    svg.append("g")
-                    .attr("transform", "translate(0," + height + ")")
-                    .call(d3.axisBottom(xScale));
-
-                    svg.append("g")
-                    .attr("transform", "translate(0," + height + ")")
-                  
-                    
-
                 var rects = groups.selectAll("rect")
                     .data(function(d) {
-                        console.log("this is what i looking for:", d)
                         return d
                     })
                     .enter()
@@ -314,38 +310,49 @@
                         return xScale(d.data.priority)
                     })
                     .attr("y", function(d) {
-                        //console.log("this is what you rlooking at:", d)
-                        return yScale(d[1])
+                        // console.log(d)
+                        if (d[0] != 0) {
+                            return yScale(round(d[0], 2))
+                        } else {
+                            return yScale(round(d[1], 2)) - round(d[1], 2)
+                        };
                     })
-                    //.style("class", ".rect1")
                     .attr("width", xScale.bandwidth())
                     .attr("height", function(d) {
-                        //console.log("look at this next:", d)
-                        return height + yScale(d[0])
+                        if (d[0] != 0) {
+                            return round(height - yScale(round(d[0], 2)), 2)
+                        } else {
+                            var total = d.data.net_cost + d.data.total_rebate;
+                            return round(height - round(yScale(round(total, 2)), 2), 2);
+                        };
                     })
-                    
+                    .attr("id", function(d) {
+                        return d.priority
+                    })
+                    .style("fill", function(d) {
+                        if (d.data.priority == "CURRENT #1") {
+                            return "orange"
+                        } else {
+                            return "blue"
+                        }
+                    })
                     .on("mouseover", function(d) {
-                            div.transition()
-                                .duration(200)
-                                .style("opacity", .9)
-                            div.html("Manufacturer:" + (d.data.manufacturer_code) + "<br>" + "Net Cost $" + (d.data.net_cost) + "<br>" + "Total Rebate $" + (d.data.total_rebate) + "<br>" + "Bid Price $")
-                                // div.html("Product Details" + "<br>" + "Manufacturer:" + (d.numOneManufacturer) + "<br>" + "Generic Name:" + (d.generic_name) + "<br>" + "Priority:" + (d.numberOnePriority) + "<br>" + "Net Cost $" + (d.numberOneNetCost) + "<br>" + "Projected Savings $" + (d.numberOneSavings))
-                                .style("left", (d3.event.pageX) + "px")
-                                .style("top", (d3.event.pageY - 28) + "px");
-                        })
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", .9)
+                        div.html("Manufacturer:" + (d.data.manufacturer_code) + "<br>" + "Net Cost $" + (d.data.net_cost) + "<br>" + "Total Rebate $" + (d.data.total_rebate) + "<br>" + "Bid Price $" + (round(d.data.net_cost + d.data.total_rebate, 2)))
+                            // div.html("Product Details" + "<br>" + "Manufacturer:" + (d.numOneManufacturer) + "<br>" + "Generic Name:" + (d.generic_name) + "<br>" + "Priority:" + (d.numberOnePriority) + "<br>" + "Net Cost $" + (d.numberOneNetCost) + "<br>" + "Projected Savings $" + (d.numberOneSavings))
+                            .style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px");
+                    })
                     .on("mouseout", function(d) {
-                            div.transition()
-                                .duration(500)
-                                .style("opacity", 0);
+                        div.transition()
+                            .duration(500)
+                            .style("opacity", 0);
                     });
-
-                // add the x Axis
-               
                 // add the y Axis
                 svg.append("g")
-                    .attr("class", "y axis")
                     .call(d3.axisLeft(yScale));
-                
                 svg.append("text")
                     .attr("transform", "rotate(-90)")
                     .attr("y", 0 - margin.left)
@@ -353,7 +360,6 @@
                     .attr("dy", "1em")
                     .style("text-anchor", "middle")
                     .text("Bid Price ");
-
             })
         }
 
