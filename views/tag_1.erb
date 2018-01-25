@@ -6,24 +6,14 @@
         fill: darkgreen;
     }
     
-    <%# rect {
+    rect {
         fill: blue;
         fill-opacity: 0.5;
         stroke: black;
         stroke-width: 1px;
-    } %>
+    }
     
-    #tooltip {
-    background-color: rgba(187, 187, 187, 0.7);
-    border-radius: 5px;
-    height: 18px;
-    opacity: 0;
-    pointer-events: none;
-    position: absolute;
-    text-align: center;
-  }
-    
-    <%# div.tooltip {
+    #tooltip  {
         position: absolute;
         text-align: left;
         width: 175px;
@@ -34,7 +24,7 @@
         border: 0px;
         border-radius: 8px;
         pointer-events: none;
-    } %>
+    } 
     
     .arc text {
         font: 10px sans-serif;
@@ -169,7 +159,7 @@
                      tooltip.transition()
                             .duration(100)
                             .style('opacity', .9);
-                    tooltip.text(`text here`)
+                    tooltip.html((d.generic_name) + "<br>" + "Manufacturer:" + (d.numOneManufacturer) + "<br>" + "Net Cost $" + (d.numberOneNetCost) + "<br>" + "Projected Savings $" + (d.numberOneSavings))
                             .style('left', `${d3.event.pageX + 2}px`)
                             .style('top', `${d3.event.pageY - 18}px`);
                  })
@@ -177,7 +167,13 @@
                      tooltip.transition()
                             .duration(400)
                                 .style('opacity', 0);
-                });
+                })
+                .on('click', function(product) {
+                    d3.select(this).style("fill", "blue")
+                    clearBarChart()
+                    buildBarChart(product)
+                    builtdPieChart(currentNetCostByProduct)
+                })
                 
             // x axis
             svg.append("g")
