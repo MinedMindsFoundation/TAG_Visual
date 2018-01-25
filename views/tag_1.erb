@@ -146,6 +146,10 @@
             var scatter = svg.append("g")
                 .attr("id", "scatterplot")
                 .attr("clip-path", "url(#clip)");
+            scatter.append("g")
+                .attr("class", "brush")
+                .call(brush);
+            
             scatter.selectAll(".dot")
                 .data(data)
                 .enter().append("circle")
@@ -197,9 +201,7 @@
                 .attr("dy", "1em")
                 .style("text-anchor", "end")
                 .text("Units Sold");
-            scatter.append("g")
-                .attr("class", "brush")
-                .call(brush);
+            
             function brushended() {
                 var s = d3.event.selection;
                 if (!s) {
