@@ -95,9 +95,9 @@
 
             var margin = {
                 top: 20,
-                right: 20,
+                right: 255,
                 bottom: 30,
-                left: 30
+                left: 60
             };
             width = 900 - margin.left - margin.right,
                 height = 480 - margin.top - margin.bottom;
@@ -107,7 +107,7 @@
                 .nice();
             var y = d3.scaleLinear()
                 .range([height, 0]);
-            var xAxis = d3.axisBottom(x).ticks(12),
+            var xAxis = d3.axisBottom(x).ticks(10),
                 yAxis = d3.axisLeft(y).ticks(12 * height / width);
             var brush = d3.brush().extent([
                     [0, 0],
