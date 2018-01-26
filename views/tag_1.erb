@@ -40,6 +40,8 @@
     .arc path {
         stroke: #fff;
     }
+
+  
 </style>
 
 
@@ -88,7 +90,7 @@
                 };
             });
             var data = currentNetCostByProduct;
-            console.log(data)
+            console.log("yo",data)
             var tooltip = d3.select('body').append('div')
                 .attr('id', 'tooltip')
                 .style('opacity', 0);
@@ -179,6 +181,7 @@
                     clearBarChart()
                     buildBarChart(product)
                     builtdPieChart(currentNetCostByProduct)
+                    updatedPieChart(currentNetCostByProduct)
                 })
 
             // x axis
@@ -480,6 +483,23 @@
 
 
         };
+
+        function updatedPieChart(currentNetCostByProduct) {
+            
+                
+           
+                    
+     
+            
+
+
+
+
+
+
+
+
+        }
     </script>
 
 </body>
