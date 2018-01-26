@@ -18,8 +18,8 @@
         border-radius: 8px;
         pointer-events: none;
     }
-
-     div.tooltip {
+    
+    div.tooltip {
         position: absolute;
         text-align: left;
         width: 175px;
@@ -53,7 +53,7 @@
     <svg id="scatter" width="700" height="500"> </svg>
     <svg id="pieChart" width="960" height="500"></svg>
 
-    
+
     <script src="http://d3js.org/d3.v4.min.js"></script>
     <script>
         // Create data
@@ -268,9 +268,9 @@
                 stackBarChartData.shift();
                 console.log(stackBarChartData);
                 var data = stackBarChartData;
-                 var tooltip = d3.select('body').append('div')
-               .attr('id', 'tooltip')
-               .style('opacity', 0);
+                var tooltip = d3.select('body').append('div')
+                    .attr('id', 'tooltip')
+                    .style('opacity', 0);
                 var margin = {
                     top: 40,
                     right: 40,
@@ -334,11 +334,11 @@
                         return xScale(d.data.priority)
                     })
                     .attr("y", function(d) {
-                        // console.log(d)
                         if (d[0] != 0) {
                             return yScale(round(d[0], 2))
                         } else {
-                            return yScale(round(d[1], 2)) - round(d[1], 2)
+                            var total = d.data.total_rebate + d.data.net_cost
+                            return yScale(round(d[1], 2)) - round(total, 2)
                         };
                     })
                     .attr("width", xScale.bandwidth())
@@ -347,7 +347,7 @@
                             return round(height - yScale(round(d[0], 2)), 2)
                         } else {
                             var total = d.data.net_cost + d.data.total_rebate;
-                            return round(height - round(yScale(round(total, 2)), 2), 2);
+                            return round(height - round(yScale(round(d[1], 2)) - round(total, 2), 2), 2);
                         };
                     })
                     .attr("id", function(d) {
@@ -485,4 +485,3 @@
 </body>
 
 </html>
-
