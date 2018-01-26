@@ -90,7 +90,8 @@
             var data = currentNetCostByProduct;
             console.log(data)
             var tooltip = d3.select('body').append('div')
-                .attr('id', 'tooltip');
+                .attr('id', 'tooltip')
+                .style('opacity', 0);
 
             var margin = {
                 top: 20,
@@ -268,12 +269,13 @@
                 console.log(stackBarChartData);
                 var data = stackBarChartData;
                  var tooltip = d3.select('body').append('div')
-                .attr('id', 'tooltip');
+               .attr('id', 'tooltip')
+               .style('opacity', 0);
                 var margin = {
                     top: 20,
                     right: 20,
                     bottom: 20,
-                    left: 20
+                    left: 40
                 };
                 var width = 960 - margin.left - margin.right;
                 var height = 500 - margin.top - margin.bottom;
