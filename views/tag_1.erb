@@ -373,6 +373,10 @@
                         } else {
                             return "blue"
                         }
+                        if (d.data.manufacturer_code == stackBarChartData[0].manufacturer_code) {
+                            console.log("Current", d);
+                            return "green"
+                        }
                     })
                     .style("fill", function(d) {
                         if (d.data.manufacturer_code == "CURRENT #1") {
