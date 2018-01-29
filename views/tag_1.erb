@@ -88,7 +88,7 @@
                 };
                 if (d.priority == "CURRENT #1") {
                     productDetails["current_manufacturer"] = (d.manufacturer_code);
-                    productDetails["currentNuberOneNetCost"] = (d.net_cost);
+                    productDetails["currentNumberOneNetCost"] = (d.net_cost);
                     productDetails["currrentNumberOneSavings"] = (0);
                     productDetails["currentNumberOnePriority"] = (d.priority);
                 };
@@ -167,8 +167,6 @@
                 .attr("class", "dot")
                 .attr("r", 4)
                 .attr("cx", function(d) {
-                    console.log("x d", d);
-                    console.log("xD", x(d.numberOneSavings))
                     return x(parseFloat(d.numberOneSavings));
                 })
                 .attr("cy", function(d) {
@@ -496,7 +494,14 @@
 
         };
 
+        function removeDonutChart() {
+
+        }
+
         function builtdDonutChart(currentNetCostByProduct) {
+            function round(value, decimals) {
+                return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+            };
             var doughnutChartCurrent = [];
             var doughnutChart1 = [];
             currentNetCostByProduct.forEach(function(d) {
@@ -504,12 +509,50 @@
                 var doughnutChartHash = {};
                 doughnutChartHash["manufacturer"] = d.numOneManufacturer;
                 doughnutChartHashCurrent["manufacturer"] = d.current_manufacturer;
-                doughnutChartHash["total"] = parseFloat(d.unitSold) + parseFloat(d.numberOneNetCost);
-                doughnutChartHashCurrent["total"] = parseFloat(d.unitSold) + parseFloat(d.currentNumberOneNetCost);
+                doughnutChartHash["total"] = round(parseFloat(d.unitSold) * parseFloat(d.numberOneNetCost), 2);
+                doughnutChartHashCurrent["total"] = round(parseFloat(d.unitSold) * parseFloat(d.currentNumberOneNetCost), 2);
                 doughnutChartCurrent.push(doughnutChartHashCurrent);
                 doughnutChart1.push(doughnutChartHash);
             })
-            console.log(doughnutChart1)
+            currentBeforeConfigure = {};
+            oneBeforeConfigure = {};
+            doughnutChart1.forEach(function(d) {
+                if (d.manufacturer in oneBeforeConfigure) {
+                    oneBeforeConfigure[d.manufacturer] += d.total
+                } else {
+                    oneBeforeConfigure[d.manufacturer] = d.total
+                }
+            })
+            doughnutChartCurrent.forEach(function(d) {
+                if (d.manufacturer in oneBeforeConfigure) {
+                    currentBeforeConfigure[d.manufacturer] += d.total
+                } else {
+                    currentBeforeConfigure[d.manufacturer] = d.total
+                }
+            })
+            var doughnutChartCurrent = [];
+            var doughnutChart1 = [];
+            var currentKeys = Object.keys(currentBeforeConfigure);
+            var currentValues = Object.values(currentBeforeConfigure);
+            currentKeys.forEach(function(d, i) {
+                var doughnutChartHashCurrent = {};
+                doughnutChartHashCurrent["manufacturer"] = d
+                doughnutChartHashCurrent["total"] = currentValues[i]
+                doughnutChartCurrent.push(doughnutChartHashCurrent)
+            });
+            var oneKeys = Object.keys(oneBeforeConfigure);
+            var oneValues = Object.values(oneBeforeConfigure);
+            currentKeys.forEach(function(d, i) {
+                var doughnutChartHash = {};
+                doughnutChartHash["manufacturer"] = d
+                doughnutChartHash["total"] = oneValues[i]
+                doughnutChart1.push(doughnutChartHash)
+            });
+
+            // console.log("current", currentBeforeConfigure)
+            // console.log("one", oneBeforeConfigure)
+            console.log("Other", doughnutChartCurrent)
+            console.log("here", doughnutChart1)
             var dataset = doughnutChart1
             var tooltip = d3.select('body').append('div')
                 .attr('id', 'tooltip')
@@ -541,9 +584,6 @@
                     return d.total;
                 })
                 .sort(null);
-
-            var legendRectSize = 10;
-            var legendSpacing = 4;
 
             var path = svg.selectAll('path')
                 .data(pie(dataset))
@@ -579,32 +619,6 @@
                     .duration(500)
                     .style("opacity", 0);
             });
-
-            var legend = svg.selectAll('.legend')
-                .data(color.domain())
-                .enter()
-                .append('g')
-                .attr('class', 'legend')
-                .attr('transform', function(d, i) {
-                    var height = legendRectSize + legendSpacing;
-                    var offset = height * color.domain().length / 2;
-                    var horz = -2 * legendRectSize;
-                    var vert = i * height - offset;
-                    return 'translate(' + horz + ',' + vert + ')';
-                });
-
-            legend.append('rect')
-                .attr('width', legendRectSize)
-                .attr('height', legendRectSize)
-                .style('fill', color)
-                .style('stroke', color);
-
-            legend.append('text')
-                .attr('x', legendRectSize + legendSpacing)
-                .attr('y', legendRectSize - legendSpacing)
-                .text(function(d) {
-                    return d;
-                });
         };
     </script>
 
