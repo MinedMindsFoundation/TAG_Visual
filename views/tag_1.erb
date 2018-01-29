@@ -374,6 +374,13 @@
                             return "blue"
                         }
                     })
+                    .style("fill", function(d) {
+                        if (d.data.manufacturer_code == "CURRENT #1") {
+                            return "orange"
+                        } else {
+                            return "blue"
+                        }
+                    })
                     .style("fill-opacity", "0.5")
                     .style("stroke", "black")
                     .style("stroke-width", "1px")
