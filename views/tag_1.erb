@@ -373,6 +373,10 @@
                         } else {
                             return "blue"
                         }
+                        if (d.data.manufacturer_code == stackBarChartData[0].manufacturer_code) {
+                            console.log("Current", d);
+                            return "green"
+                        }
                     })
                     .style("fill-opacity", "0.5")
                     .style("stroke", "black")
@@ -542,7 +546,7 @@
             });
             var oneKeys = Object.keys(oneBeforeConfigure);
             var oneValues = Object.values(oneBeforeConfigure);
-            currentKeys.forEach(function(d, i) {
+            oneKeys.forEach(function(d, i) {
                 var doughnutChartHash = {};
                 doughnutChartHash["manufacturer"] = d
                 doughnutChartHash["total"] = oneValues[i]
