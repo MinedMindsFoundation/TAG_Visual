@@ -531,18 +531,9 @@
             })
             console.log(doughnutChart1)
             var dataset = doughnutChart1
-            var tooltip = d3.select('#donutChart')
-                .append('div')
-                .attr('class', 'tooltip');
-
-            tooltip.append('div')
-                .attr('class', 'label');
-
-            tooltip.append('div')
-                .attr('class', 'count');
-
-            tooltip.append('div')
-                .attr('class', 'percent');
+           var tooltip = d3.select('body').append('div')
+                    .attr('id', 'tooltip')
+                    .style('opacity', 0);
 
             var width = 360;
             var height = 360;
