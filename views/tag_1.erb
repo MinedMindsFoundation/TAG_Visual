@@ -1,7 +1,6 @@
 <!doctype html>
 <meta charset="utf-8">
 <html>
-<link href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.1/normalize.min.css" rel="stylesheet" data-semver="3.0.1" data-require="normalize@*" />
 <style>
     .bar {
         fill: darkgreen;
@@ -51,25 +50,6 @@
         margin: 0 auto;
         position: relative;
         width: 360px;
-    }
-    
-    .tooltip {
-        box-shadow: 0 0 5px #999999;
-        display: none;
-        font-size: 12px;
-        left: 130px;
-        padding: 10px;
-        position: absolute;
-        text-align: center;
-        top: 95px;
-        width: 80px;
-        z-index: 10;
-        line-height: 140%;
-        font-family: "Open Sans", sans-serif;
-        font-weight: 300;
-        background: rgba(0, 0, 0, 0.8);
-        color: #fff;
-        border-radius: 2px;
     }
     
     .label {
@@ -531,9 +511,9 @@
             })
             console.log(doughnutChart1)
             var dataset = doughnutChart1
-           var tooltip = d3.select('body').append('div')
-                    .attr('id', 'tooltip')
-                    .style('opacity', 0);
+            var tooltip = d3.select('body').append('div')
+                .attr('id', 'tooltip')
+                .style('opacity', 0);
 
             var width = 360;
             var height = 360;
@@ -580,59 +560,53 @@
                     return d.total;
                 }));
                 var percent = Math.round(1000 * d.data.total / total) / 10;
-                tooltip.select('.label').html(d.data.manufacturer);
-                tooltip.select('.count').html(d.data.total);
-                tooltip.select('.percent').html(percent + '%');
-                tooltip.style('display', 'block');
+                tooltip.transition()
+                    .duration(200)
+                    .style("opacity", .9)
+                tooltip.html("Manufacturer:" + (d.data.manufacturer) + "<br>" + "Total $" + (d.data.total))
+                    .style("left", (d3.event.pageX) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px")
+                    .style("width", "150px")
+                    .style("height", "30px")
+                    .style("background", "rgba(0, 0, 0, 0.8)")
+                    .style("color", "white")
+                    .style("text-align", "center");
+
             });
 
             path.on('mouseout', function() {
-                tooltip.style('display', 'none');
+                tooltip.transition()
+                    .duration(500)
+                    .style("opacity", 0);
             });
 
-            var legend = svg.selectAll('.legend')
-                .data(color.domain())
-                .enter()
-                .append('g')
-                .attr('class', 'legend')
-                .attr('transform', function(d, i) {
-                    var height = legendRectSize + legendSpacing;
-                    var offset = height * color.domain().length / 2;
-                    var horz = -2 * legendRectSize;
-                    var vert = i * height - offset;
-                    return 'translate(' + horz + ',' + vert + ')';
-                });
+          //  var legend = svg.selectAll('.legend')
+             //   .data(color.domain())
+             //   .enter()
+              //  .append('g')
+             //   .attr('class', 'legend')
+             //   .attr('transform', function(d, i) {
+             //       var height = legendRectSize + legendSpacing;
+             //       var offset = height * color.domain().length / 2;
+             //       var horz = -2 * legendRectSize;
+             //       var vert = i * height - offset;
+             //       return 'translate(' + horz + ',' + vert + ')';
+           //     });
 
-            legend.append('rect')
-                .attr('width', legendRectSize)
-                .attr('height', legendRectSize)
-                .style('fill', color)
-                .style('stroke', color);
+          //  legend.append('rect')
+         //       .attr('width', legendRectSize)
+          //      .attr('height', legendRectSize)
+          //      .style('fill', color)
+         //       .style('stroke', color);
 
-            legend.append('text')
-                .attr('x', legendRectSize + legendSpacing)
-                .attr('y', legendRectSize - legendSpacing)
-                .text(function(d) {
-                    return d;
-                });
+          //  legend.append('text')
+           //     .attr('x', legendRectSize + legendSpacing)
+           //     .attr('y', legendRectSize - legendSpacing)
+           //     .text(function(d) {
+          //          return d;
+          //      });
         };
 
-        function updatedPieChart(currentNetCostByProduct) {
-            
-                
-           
-                    
-     
-            
-
-
-
-
-
-
-
-
-        }
     </script>
 
 </body>
