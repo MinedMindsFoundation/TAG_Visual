@@ -509,7 +509,11 @@
                             .style('opacity', .9);
                         tooltip.html("Manufacturer:" + (d.data.manufacturer) + "<br>" + round(getPercentage(round(pieValues.reduce(getSum), 2), d.data.value), 2) + "%")
                             .style('left', `${d3.event.pageX + 2}px`)
-                            .style('top', `${d3.event.pageY - 18}px`);
+                            .style('top', `${d3.event.pageY - 18}px`)
+                            .style("width", "150px")
+                            .style("height", "30px")
+                            .style("background", "lightsteelblue")
+                            .style("text-align", "center");
                     })
                     .on('mouseout', function(d) {
                         tooltip.transition()
