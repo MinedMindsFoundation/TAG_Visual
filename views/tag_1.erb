@@ -65,9 +65,9 @@
 </head>
 
 <body>
-    <svg id="scatter" width="700" height="500"> </svg>
-    <svg id="donutChart" width="960" height="500"></svg>
-    <svg id="pieChart" width="960" height="500"></svg>
+    <svg id="scatter" width="700" height="500"></svg>
+    <svg id="pieChart" width="370" height="370"></svg>
+    <svg id="donutChart" width="370" height="370"></svg>
 
     <script src="http://d3js.org/d3.v4.min.js"></script>
     <script>
@@ -112,7 +112,7 @@
                 top: 20,
                 right: 255,
                 bottom: 30,
-                left: 60
+                left: 40
             };
             width = 900 - margin.left - margin.right,
                 height = 480 - margin.top - margin.bottom;
@@ -286,7 +286,7 @@
                     .attr('id', 'tooltip')
                     .style('opacity', 0);
                 var margin = {
-                    top: 40,
+                    top: 0,
                     right: 40,
                     bottom: 40,
                     left: 40
@@ -370,12 +370,12 @@
                     .style("fill", function(d) {
                         if (d.data.priority == "CURRENT #1") {
                             return "orange"
-                        } else {
-                            return "blue"
                         }
                         if (d.data.manufacturer_code == stackBarChartData[0].manufacturer_code) {
                             console.log("Current", d);
                             return "green"
+                        } else {
+                            return "blue"
                         }
                     })
                     .style("fill-opacity", "0.5")
@@ -508,6 +508,8 @@
             };
             var doughnutChartCurrent = [];
             var doughnutChart1 = [];
+            var percentage1Total = [];
+            var percentageCurrentTotal = [];
             currentNetCostByProduct.forEach(function(d) {
                 var doughnutChartHashCurrent = {};
                 var doughnutChartHash = {};
@@ -515,9 +517,24 @@
                 doughnutChartHashCurrent["manufacturer"] = d.current_manufacturer;
                 doughnutChartHash["total"] = round(parseFloat(d.unitSold) * parseFloat(d.numberOneNetCost), 2);
                 doughnutChartHashCurrent["total"] = round(parseFloat(d.unitSold) * parseFloat(d.currentNumberOneNetCost), 2);
+                percentage1Total.push(round(parseFloat(d.unitSold) * parseFloat(d.numberOneNetCost), 2));
+                percentageCurrentTotal.push(round(parseFloat(d.unitSold) * parseFloat(d.currentNumberOneNetCost), 2));
                 doughnutChartCurrent.push(doughnutChartHashCurrent);
                 doughnutChart1.push(doughnutChartHash);
             })
+
+            function getSum(total, num) {
+                return total + num;
+            }
+
+            function getPercentage(total, num) {
+                max = num * 100
+                return round(total / max, 2)
+            }
+            console.log(percentage1Total)
+            console.log("1st element", percentage1Total[13])
+            console.log(getPercentage(round(percentage1Total.reduce(getSum), 2), percentage1Total[13]))
+            console.log(percentage1Total.reduce(getSum))
             currentBeforeConfigure = {};
             oneBeforeConfigure = {};
             doughnutChart1.forEach(function(d) {
@@ -528,10 +545,10 @@
                 }
             })
             doughnutChartCurrent.forEach(function(d) {
-                if (d.manufacturer in oneBeforeConfigure) {
+                if (d.manufacturer in currentBeforeConfigure) {
                     currentBeforeConfigure[d.manufacturer] += d.total
                 } else {
-                    currentBeforeConfigure[d.manufacturer] = d.total
+                    currentBeforeConfigure[d.manufacturer] = parseFloat(d.total)
                 }
             })
             var doughnutChartCurrent = [];
@@ -584,7 +601,6 @@
 
             var pie = d3.pie()
                 .value(function(d) {
-                    console.log(d)
                     return d.total;
                 })
                 .sort(null);
