@@ -17,7 +17,7 @@ post '/choice' do
         check_connection()
         data = getinfo()
         writecsv(data)
-      p  "#{writecsv(data)}"
+    #   p  "#{data}"
         erb :tag_2
     end
 end

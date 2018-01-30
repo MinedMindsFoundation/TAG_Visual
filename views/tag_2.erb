@@ -71,36 +71,28 @@
     <script src="http://d3js.org/d3.v4.min.js"></script>
     <script>
         // Create data
-        d3.csv("csv/new_rX.csv", function(error, data) {
+        d3.csv("csv/tag_rx.csv", function(error, data) {
              console.log("data", data)
             var unitSoldArray = [];
             var savingsArray = [];
             var productDetails = {};
             var currentNetCostByProduct = [];
             data.forEach(function(d) {
-                if (d.generic_name != "") {
-                    productDetails["id"] = (d.id);
+                if (d.system_priority == 1) {
+                    productDetails["id"] = (d.campaign_product_id);
                     productDetails["generic_name"] = (d.generic_name);
                     productDetails["unitSold"] = (d.rolling_yearly_usage);
-                    unitSoldArray.push(parseFloat(d.rolling_yearly_usage));
-                    // currentNetCostByProduct.push(productDetails);
-                };
-                if (d.priority == "CURRENT #1") {
-                    productDetails["current_manufacturer"] = (d.manufacturer_code);
-                    productDetails["currentNumberOneNetCost"] = (d.net_cost);
-                    productDetails["currrentNumberOneSavings"] = (0);
-                    productDetails["currentNumberOnePriority"] = (d.priority);
-                };
-                if (d.priority == 1) {
-                    productDetails["numOneManufacturer"] = (d.manufacturer_code);
+                    productDetails["numOneManufacturer"] = (d.bid_vender);
                     productDetails["numberOneNetCost"] = (d.net_cost);
-                    productDetails["numberOneSavings"] = (d.saving);
-                    productDetails["numberOnePriority"] = (d.priority);
+                    productDetails["numberOneSavings"] = (d.annual_savings);
+                    productDetails["numberOnePriority"] = (d.system_priority);
+                    unitSoldArray.push(parseFloat(d.rolling_yearly_usage));
                     currentNetCostByProduct.push(productDetails);
-                    savingsArray.push(parseFloat(d.saving));
+                    savingsArray.push(parseFloat(d.annual_savings));
                     productDetails = {};
                 };
             });
+            console.log("this is the new data", currentNetCostByProduct)
             var data = currentNetCostByProduct;
             console.log("yo", data)
             var tooltip = d3.select('body').append('div')
