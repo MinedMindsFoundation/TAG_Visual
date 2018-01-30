@@ -65,15 +65,11 @@
 </head>
 
 <body>
-<<<<<<< HEAD
-    <svg id="scatter" width="700" height="500"> </svg>
-    <svg id="donutChart" width="400" height="500"></svg>
-    <svg id="pieChart" width="400" height="500"></svg>
-=======
     <svg id="scatter" width="700" height="500"></svg>
     <svg id="pieChart" width="370" height="370"></svg>
+    <svg id="stackedChart" width="700" height="500"></svg>
     <svg id="donutChart" width="370" height="370"></svg>
->>>>>>> 4587ad96557de66c0d2e2476912151979a243e73
+   
 
     <script src="http://d3js.org/d3.v4.min.js"></script>
     <script>
@@ -121,7 +117,7 @@
                 left: 40
             };
             width = 900 - margin.left - margin.right,
-                height = 480 - margin.top - margin.bottom;
+                height = 400 - margin.top - margin.bottom;
 
             var x = d3.scaleLinear()
                 .range([0, width])
@@ -297,9 +293,9 @@
                     bottom: 40,
                     left: 40
                 };
-                var width = 960 - margin.left - margin.right;
+                var width = 500 - margin.left - margin.right;
                 var height = 500 - margin.top - margin.bottom;
-                var svg = d3.select("body").append("svg")
+                var svg = d3.select("#stackedChart").append("svg")
                     .attr("id", "barChart")
                     .attr("width", width + margin.left + margin.bottom)
                     .attr("height", height + margin.top + margin.bottom)
@@ -376,19 +372,11 @@
                     .style("fill", function(d) {
                         if (d.data.priority == "CURRENT #1") {
                             return "orange"
-<<<<<<< HEAD
-                        } 
-                        if (d.data.manufacturer_code == stackBarChartData[0].manufacturer_code) {
-                            console.log("Current", d);
-                            return "green"
-                        }else {
-=======
                         }
                         if (d.data.manufacturer_code == stackBarChartData[0].manufacturer_code) {
                             console.log("Current", d);
                             return "green"
                         } else {
->>>>>>> 4587ad96557de66c0d2e2476912151979a243e73
                             return "blue"
                         }
                     })
@@ -615,10 +603,6 @@
 
             var pie = d3.pie()
                 .value(function(d) {
-<<<<<<< HEAD
-                    console.log("this is it", d)
-=======
->>>>>>> 4587ad96557de66c0d2e2476912151979a243e73
                     return d.total;
                 })
                 .sort(null);
