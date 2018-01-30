@@ -419,6 +419,9 @@
                 g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
             var color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+             var tooltip = d3.select('body').append('div')
+                .attr('id', 'tooltip')
+                .style('opacity', 0);
 
             var pie = d3.pie()
                 .sort(null)
@@ -473,7 +476,7 @@
                     pieChartHash["value"] = pieValues[i]
                     pieChartArray.push(pieChartHash)
                 });
-                console.log(pieChartArray)
+                console.log("lookatmenow", pieChartArray)
 
                 var arc = g.selectAll(".arc")
                     .data(pie(pieChartArray))
@@ -484,9 +487,22 @@
                 arc.append("path")
                     .attr("d", path)
                     .attr("fill", function(d) {
-                        //console.log("look at me", d)
+                       // console.log("look at me", d)
                         return color(d.data.manufacturer);
-                    });
+                    })
+                    .on('mouseover', function(d) {
+                    tooltip.transition()
+                        .duration(100)
+                        .style('opacity', .9);
+                    tooltip.html("Manufacturer:" + (d.data.manufacturer) + "")
+                        .style('left', `${d3.event.pageX + 2}px`)
+                        .style('top', `${d3.event.pageY - 18}px`);
+                    })
+                    .on('mouseout', function(d) {
+                        tooltip.transition()
+                            .duration(400)
+                            .style('opacity', 0);
+                    })
 
                 arc.append("text")
                     .attr("transform", function(d) {
@@ -496,6 +512,7 @@
                     .text(function(d) {
                         return d.data.manufacturer
                     }); //console.log("this is after each do", pieChartData);
+            
             });
 
         };
@@ -613,6 +630,7 @@
                     return color(d.data.manufacturer);
 
                 });
+            
 
             path.on('mouseover', function(d) {
                 var total = d3.sum(dataset.map(function(d) {
