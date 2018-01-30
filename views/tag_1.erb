@@ -69,7 +69,7 @@
     <svg id="pieChart" width="370" height="370"></svg>
     <svg id="stackedChart" width="700" height="500"></svg>
     <svg id="donutChart" width="370" height="370"></svg>
-   
+
 
     <script src="http://d3js.org/d3.v4.min.js"></script>
     <script>
@@ -105,7 +105,7 @@
                 };
             });
             var data = currentNetCostByProduct;
-            console.log("yo",data)
+            console.log("yo", data)
             var tooltip = d3.select('body').append('div')
                 .attr('id', 'tooltip')
                 .style('opacity', 0);
@@ -519,24 +519,18 @@
                 doughnutChartHashCurrent["manufacturer"] = d.current_manufacturer;
                 doughnutChartHash["total"] = round(parseFloat(d.unitSold) * parseFloat(d.numberOneNetCost), 2);
                 doughnutChartHashCurrent["total"] = round(parseFloat(d.unitSold) * parseFloat(d.currentNumberOneNetCost), 2);
-                percentage1Total.push(round(parseFloat(d.unitSold) * parseFloat(d.numberOneNetCost), 2));
-                percentageCurrentTotal.push(round(parseFloat(d.unitSold) * parseFloat(d.currentNumberOneNetCost), 2));
                 doughnutChartCurrent.push(doughnutChartHashCurrent);
                 doughnutChart1.push(doughnutChartHash);
             })
 
             function getSum(total, num) {
-                return total + num;
+                return round(total, 2) + round(num, 2);
             }
 
             function getPercentage(total, num) {
-                max = num * 100
-                return round(total / max, 2)
+                max = num * 1000
+                return round(max / total, 2)
             }
-            console.log(percentage1Total)
-            console.log("1st element", percentage1Total[13])
-            console.log(getPercentage(round(percentage1Total.reduce(getSum), 2), percentage1Total[13]))
-            console.log(percentage1Total.reduce(getSum))
             currentBeforeConfigure = {};
             oneBeforeConfigure = {};
             doughnutChart1.forEach(function(d) {
@@ -557,6 +551,9 @@
             var doughnutChart1 = [];
             var currentKeys = Object.keys(currentBeforeConfigure);
             var currentValues = Object.values(currentBeforeConfigure);
+            // console.log("Values", currentValues)
+            // console.log(currentValues.reduce(getSum))
+            // console.log(round(getPercentage(currentValues.reduce(getSum), currentValues[2]), 2))
             currentKeys.forEach(function(d, i) {
                 var doughnutChartHashCurrent = {};
                 doughnutChartHashCurrent["manufacturer"] = d
@@ -574,8 +571,8 @@
 
             // console.log("current", currentBeforeConfigure)
             // console.log("one", oneBeforeConfigure)
-            console.log("Other", doughnutChartCurrent)
-            console.log("here", doughnutChart1)
+            // console.log("Other", doughnutChartCurrent)
+            // console.log("here", doughnutChart1)
             var dataset = doughnutChart1
             var tooltip = d3.select('body').append('div')
                 .attr('id', 'tooltip')
@@ -625,11 +622,11 @@
                 tooltip.transition()
                     .duration(200)
                     .style("opacity", .9)
-                tooltip.html("Manufacturer:" + (d.data.manufacturer) + "<br>" + "Total $" + (d.data.total))
+                tooltip.html("Manufacturer:" + (d.data.manufacturer) + "<br>" + "Total $" + (d.data.total) + "<br>" + round(getPercentage(currentValues.reduce(getSum), d.data.total), 2) + "%")
                     .style("left", (d3.event.pageX) + "px")
                     .style("top", (d3.event.pageY - 28) + "px")
                     .style("width", "150px")
-                    .style("height", "30px")
+                    .style("height", "50px")
                     .style("background", "rgba(0, 0, 0, 0.8)")
                     .style("color", "white")
                     .style("text-align", "center");
@@ -642,7 +639,6 @@
                     .style("opacity", 0);
             });
         };
-
     </script>
 
 </body>
