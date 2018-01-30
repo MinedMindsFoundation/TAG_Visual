@@ -1,0 +1,256 @@
+<!doctype html>
+<meta charset="utf-8">
+<html>
+<style>
+    .bar {
+        fill: darkgreen;
+    }
+    
+    #tooltip {
+        position: absolute;
+        text-align: left;
+        width: 175px;
+        height: 120px;
+        padding: 2px;
+        font: 12px sans-serif;
+        background: lightsteelblue;
+        border: 0px;
+        border-radius: 8px;
+        pointer-events: none;
+    }
+    
+    div.tooltip {
+        position: absolute;
+        text-align: left;
+        width: 175px;
+        height: 120px;
+        padding: 2px;
+        font: 12px sans-serif;
+        background: lightsteelblue;
+        border: 0px;
+        border-radius: 8px;
+        pointer-events: none;
+    }
+    
+    .arc text {
+        font: 10px sans-serif;
+        text-anchor: middle;
+    }
+    
+    .arc path {
+        stroke: #fff;
+    }
+    
+    .legend {
+        font-size: 13px;
+    }
+    
+    #chart {
+        height: 360px;
+        margin: 0 auto;
+        position: relative;
+        width: 360px;
+    }
+    
+    .label {
+        font-weight: 600;
+    }
+</style>
+
+
+
+<head>
+
+    <h1> </h1>
+</head>
+
+<body>
+    <svg id="scatter" width="700" height="500"></svg>
+
+
+    <script src="http://d3js.org/d3.v4.min.js"></script>
+    <script>
+        // Create data
+        d3.csv("csv/new_rX.csv", function(error, data) {
+             console.log("data", data)
+            var unitSoldArray = [];
+            var savingsArray = [];
+            var productDetails = {};
+            var currentNetCostByProduct = [];
+            data.forEach(function(d) {
+                if (d.generic_name != "") {
+                    productDetails["id"] = (d.id);
+                    productDetails["generic_name"] = (d.generic_name);
+                    productDetails["unitSold"] = (d.rolling_yearly_usage);
+                    unitSoldArray.push(parseFloat(d.rolling_yearly_usage));
+                    // currentNetCostByProduct.push(productDetails);
+                };
+                if (d.priority == "CURRENT #1") {
+                    productDetails["current_manufacturer"] = (d.manufacturer_code);
+                    productDetails["currentNumberOneNetCost"] = (d.net_cost);
+                    productDetails["currrentNumberOneSavings"] = (0);
+                    productDetails["currentNumberOnePriority"] = (d.priority);
+                };
+                if (d.priority == 1) {
+                    productDetails["numOneManufacturer"] = (d.manufacturer_code);
+                    productDetails["numberOneNetCost"] = (d.net_cost);
+                    productDetails["numberOneSavings"] = (d.saving);
+                    productDetails["numberOnePriority"] = (d.priority);
+                    currentNetCostByProduct.push(productDetails);
+                    savingsArray.push(parseFloat(d.saving));
+                    productDetails = {};
+                };
+            });
+            var data = currentNetCostByProduct;
+            console.log("yo", data)
+            var tooltip = d3.select('body').append('div')
+                .attr('id', 'tooltip')
+                .style('opacity', 0);
+
+            var margin = {
+                top: 20,
+                right: 255,
+                bottom: 30,
+                left: 40
+            };
+            width = 900 - margin.left - margin.right,
+                height = 400 - margin.top - margin.bottom;
+
+            var x = d3.scaleLinear()
+                .range([0, width])
+                .nice();
+            var y = d3.scaleLinear()
+                .range([height, 0]);
+            var xAxis = d3.axisBottom(x).ticks(10),
+                yAxis = d3.axisLeft(y).ticks(12 * height / width);
+            var brush = d3.brush().extent([
+                    [0, 0],
+                    [width, height]
+                ]).on("end", brushended),
+                idleTimeout,
+                idleDelay = 350;
+            var svg = d3.select("#scatter").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            var clip = svg.append("defs").append("svg:clipPath")
+                .attr("id", "clip")
+                .append("svg:rect")
+                .attr("width", width)
+                .attr("height", height)
+                .attr("x", 0)
+                .attr("y", 0);
+            var xExtent = d3.extent(savingsArray, function(d) {
+                return d;
+            });
+            var yExtent = d3.extent(unitSoldArray, function(d) {
+                return d;
+            });
+            x.domain(d3.extent(savingsArray, function(d) {
+                return d;
+            })).nice();
+            y.domain(d3.extent(unitSoldArray, function(d) {
+                return d;
+            })).nice();
+            var scatter = svg.append("g")
+                .attr("id", "scatterplot")
+                .attr("clip-path", "url(#clip)");
+            scatter.append("g")
+                .attr("class", "brush")
+                .call(brush);
+
+            scatter.selectAll(".dot")
+                .data(data)
+                .enter().append("circle")
+                .attr("class", "dot")
+                .attr("r", 4)
+                .attr("cx", function(d) {
+                    return x(parseFloat(d.numberOneSavings));
+                })
+                .attr("cy", function(d) {
+                    return y(parseFloat(d.unitSold));
+                })
+                .attr("opacity", 0.5)
+                .style("fill", "#4292c6")
+                .on('mouseover', function(d) {
+                    tooltip.transition()
+                        .duration(100)
+                        .style('opacity', .9);
+                    tooltip.html((d.generic_name) + "<br>" + "Manufacturer:" + (d.numOneManufacturer) + "<br>" + "Net Cost $" + (d.numberOneNetCost) + "<br>" + "Projected Savings $" + (d.numberOneSavings))
+                        .style('left', `${d3.event.pageX + 2}px`)
+                        .style('top', `${d3.event.pageY - 18}px`);
+                })
+                .on('mouseout', function(d) {
+                    tooltip.transition()
+                        .duration(400)
+                        .style('opacity', 0);
+                })
+                .on('click', function(product) {
+                    d3.select(this).style("fill", "blue")
+                    clearBarChart()
+                    buildBarChart(product)
+                    builtdPieChart(currentNetCostByProduct)
+                    builtdDonutChart(currentNetCostByProduct)
+                })
+
+            // x axis
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr('id', "axis--x")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis);
+            svg.append("text")
+                .style("text-anchor", "end")
+                .attr("x", width)
+                .attr("y", height - 8)
+                .text("Savings");
+            // y axis
+            svg.append("g")
+                .attr("class", "y axis")
+                .attr('id', "axis--y")
+                .call(yAxis);
+            svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("dy", "1em")
+                .style("text-anchor", "end")
+                .text("Units Sold");
+
+            function brushended() {
+                var s = d3.event.selection;
+                if (!s) {
+                    if (!idleTimeout) return idleTimeout = setTimeout(idled, idleDelay);
+                    x.domain(d3.extent(data, function(d) {
+                        return parseFloat(d.numberOneSavings);
+                    })).nice();
+                    y.domain(d3.extent(data, function(d) {
+                        return parseFloat(d.unitSold);
+                    })).nice();
+                } else {
+                    x.domain([s[0][0], s[1][0]].map(x.invert, x));
+                    y.domain([s[1][1], s[0][1]].map(y.invert, y));
+                    scatter.select(".brush").call(brush.move, null);
+                }
+                zoom();
+            }
+
+            function idled() {
+                idleTimeout = null;
+            }
+
+            function zoom() {
+                var t = scatter.transition().duration(750);
+                svg.select("#axis--x").transition(t).call(xAxis);
+                svg.select("#axis--y").transition(t).call(yAxis);
+                scatter.selectAll("circle").transition(t)
+                    .attr("cx", function(d) {
+                        return x(parseFloat(d.numberOneSavings));
+                    })
+                    .attr("cy", function(d) {
+                        return y(parseFloat(d.unitSold));
+                    });
+            }
+        });
+    </script>
+</body>    
