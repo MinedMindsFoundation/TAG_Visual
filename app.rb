@@ -1,7 +1,8 @@
 require 'sinatra'
 require 'csv'
 require 'pg'
-require_relative 'databasefunc.rb'
+require_relative 'database_func.rb'
+require_relative 'csv_func.rb'
 load './local_env.rb' if File.exist?('./local_env.rb')
 
 get '/' do 
@@ -14,7 +15,9 @@ post '/choice' do
         erb :tag_1
     elsif choice == "Tag_2"
         check_connection()
-        info = getinfo()
+        data = getinfo()
+        writecsv(data)
+      p  "#{data}"
         erb :tag_2
     end
 end

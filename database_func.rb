@@ -30,7 +30,7 @@ def getinfo()
 	      result.each do |row|
 	          data << row.values
 	        end
-	         p "#{data} data is here"
+	        #  p "#{data} data is here"
         end
     db.close    
 	data    
