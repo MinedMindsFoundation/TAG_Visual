@@ -19,8 +19,9 @@ post '/choice' do
         check_connection()
         data = getinfo()
         # writecsv(data)
-        writejson(data)
+        # writejson(data)
+        converted_data = data_converter(data)
     #   p  "#{data}"
-        erb :tag_2
+        erb :tag_2, locals:{converted_data:converted_data}
     end
 end
