@@ -73,7 +73,7 @@
     <script>
         // Create data
         d3.csv("csv/tag_rx.csv", function(error, data) {
-             console.log("data", data)
+            console.log("data", data)
             var unitSoldArray = [];
             var savingsArray = [];
             var productDetails = {};
@@ -84,6 +84,10 @@
                     productDetails["primary_vender"] = (d.primary_vendor_code);
                     productDetails["generic_name"] = (d.generic_name);
                     productDetails["unitSold"] = (d.rolling_yearly_usage);
+                    productDetails["primary_manufacturer"] = (d.primary_vendor_code);
+                    productDetails["primary_bid_price"] = (d.primary_bid_price);
+                    productDetails["primary_total_rebate"] = (d.primary_total_rebate);
+                    productDetails["primary_net_cost"] = (d.primary_net_cost);
                     productDetails["numOneManufacturer"] = (d.bid_vender);
                     productDetails["numberOneNetCost"] = (d.net_cost);
                     productDetails["numberOneSavings"] = (d.annual_savings);
@@ -184,8 +188,8 @@
                     d3.select(this).style("fill", "blue")
                     clearBarChart()
                     buildBarChart(product)
-                    //builtdPieChart(currentNetCostByProduct)
-                   // builtdDonutChart(currentNetCostByProduct)
+                        //builtdPieChart(currentNetCostByProduct)
+                        // builtdDonutChart(currentNetCostByProduct)
                 })
 
             // x axis
@@ -247,166 +251,170 @@
             }
 
             function clearBarChart() {
-            d3.select("#barChart").remove()
-        }
+                d3.select("#barChart").remove()
+            }
 
 
-        function padExtent(e, p) {
-            if (p === undefined) p = 1;
-            return ([e[0] - p, e[1] + p]);
-        }
+            function padExtent(e, p) {
+                if (p === undefined) p = 1;
+                return ([e[0] - p, e[1] + p]);
+            }
 
-        function buildBarChart(product) {
-            console.log("this is the data from th onclick", product);
-            d3.csv("csv/tag_rx.csv", function(d) {
-                
-                
-                var stackBarChartData = [];
-                
-                d.forEach(function(d) {
-                    //console.log("this is the data that is in the foreach", d)
-                    if (d.campaign_product_id == product.id) {
-                        barChartHash = {};
-                        barChartHash["manufacturer_code"] = d.bid_vender;
-                        barChartHash["priority"] = d.system_priority;
-                        barChartHash["net_cost"] = parseFloat(d.net_cost);
-                        barChartHash["total_rebate"] = parseFloat(d.total_rebate);
-                        barChartHash["primary_vender"] = (d.primary_vendor_code);
-                        stackBarChartData.push(barChartHash);
+            function buildBarChart(product) {
+                console.log("this is the data from th onclick", product);
+                d3.csv("csv/tag_rx.csv", function(d) {
+
+
+                    var stackBarChartData = [];
+                    var primaryVenderData = {};
+                    primaryVenderData["manufacturer_code"] = product.primary_manufacturer;
+                    primaryVenderData["priority"] = "CURRENT #1";
+                    primaryVenderData["net_cost"] = parseFloat(product.primary_net_cost);
+                    primaryVenderData["total_rebate"] = parseFloat(product.primary_total_rebate);
+                    stackBarChartData.push(primaryVenderData)
+                    d.forEach(function(d) {
+                        //console.log("this is the data that is in the foreach", d)
+                        if (d.campaign_product_id == product.id) {
+                            barChartHash = {};
+                            primaryHash = {};
+                            barChartHash["manufacturer_code"] = d.bid_vender;
+                            barChartHash["priority"] = d.system_priority;
+                            barChartHash["net_cost"] = parseFloat(d.net_cost);
+                            barChartHash["total_rebate"] = parseFloat(d.total_rebate);
+                            stackBarChartData.push(barChartHash);
+                        };
+                    })
+
+                    //stackBarChartData.shift();
+                    console.log("stackBarChartData", stackBarChartData);
+                    console.log("primaryVenderData", primaryVenderData);
+                    var data = stackBarChartData;
+                    var tooltip = d3.select('body').append('div')
+                        .attr('id', 'tooltip')
+                        .style('opacity', 0);
+                    var margin = {
+                        top: 0,
+                        right: 40,
+                        bottom: 40,
+                        left: 40
                     };
-                })
-               
-                //stackBarChartData.shift();
-                console.log("stackBarChartData", stackBarChartData);
-                var data = stackBarChartData;
-                var tooltip = d3.select('body').append('div')
-                    .attr('id', 'tooltip')
-                    .style('opacity', 0);
-                var margin = {
-                    top: 0,
-                    right: 40,
-                    bottom: 40,
-                    left: 40
-                };
-                var width = 500 - margin.left - margin.right;
-                var height = 500 - margin.top - margin.bottom;
-                var svg = d3.select("#stackedChart").append("svg")
-                    .attr("id", "barChart")
-                    .attr("width", width + margin.left + margin.bottom)
-                    .attr("height", height + margin.top + margin.bottom)
-                    .append("g")
-                    .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
+                    var width = 500 - margin.left - margin.right;
+                    var height = 500 - margin.top - margin.bottom;
+                    var svg = d3.select("#stackedChart").append("svg")
+                        .attr("id", "barChart")
+                        .attr("width", width + margin.left + margin.bottom)
+                        .attr("height", height + margin.top + margin.bottom)
+                        .append("g")
+                        .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
 
-                function round(value, decimals) {
-                    return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
-                };
-                // min/max
-                var xExtent;
-                var yExtent = d3.extent(data, function(d) {
-                    //console.log("Net_C", d.net_cost);
-                    //console.log("rebate", d.total_rebate);
-                    //console.log(d.net_cost + d.total_rebate);
-                    var nicer = d.net_cost + d.total_rebate;
-                   // console.log("THIS", round(nicer, 2));
-                    return round(nicer, 2)
-                });
-                //console.log("heigh", height)
-                //console.log("y", yExtent)
-                // domain
-                var xScale = d3.scaleBand()
-                    .domain(data.map(function(d) {
-                        return d.priority;
-                    }))
-                    .range([0, width]);
-                var yScale = d3.scaleLinear()
-                    .domain([0, yExtent[1]])
-                    .range([height, 0]);
-                var x = d3.scaleBand()
-                    .domain(data.map(function(d) {
-                        return d.priority;
-                    }))
-                    .range([0, width]);
-                var stack = d3.stack()
-                    .keys(["net_cost", "total_rebate"])
-                    .order(d3.stackOrderNone)
-                    .offset(d3.stackOffsetNone);
-                var series = stack(data);
-                var groups = svg.selectAll("g")
-                    .data(stack(data))
-                    .enter()
-                    .append("g");
-                var rects = groups.selectAll("rect")
-                    .data(function(d) {
-                        return d
-                    })
-                    .enter()
-                    .append("rect")
-                    .attr("x", function(d) {
-                        return xScale(d.data.priority)
-                    })
-                    .attr("y", function(d) {
-                        if (d[0] != 0) {
-                            return yScale(round(d[0], 2))
-                        } else {
-                            var total = d.data.total_rebate + d.data.net_cost
-                            return yScale(round(d[1], 2)) - round(total, 2)
-                        };
-                    })
-                    .attr("width", xScale.bandwidth())
-                    .attr("height", function(d) {
-                        if (d[0] != 0) {
-                            return round(height - yScale(round(d[0], 2)), 2)
-                        } else {
-                            var total = d.data.net_cost + d.data.total_rebate;
-                            return round(height - round(yScale(round(d[1], 2)) - round(total, 2), 2), 2);
-                        };
-                    })
-                    .attr("id", function(d) {
-                        //console.log("this is what i need to look at", d)
-                        return d.priority
-                    })
-                    .style("fill", function(d) {
-                        if (d.data.priority != "1") {
-                            console.log("look here", d.data.pr)
-                            return "orange"
-                        }
-                        if (d.data.manufacturer_code == stackBarChartData[0].manufacturer_code) {
-                            console.log("Current", d);
-                            return "green"
-                        } else {
-                            return "blue"
-                        }
-                    })
-                    .style("fill-opacity", "0.5")
-                    .style("stroke", "black")
-                    .style("stroke-width", "1px")
-                    .on("mouseover", function(d) {
-                        tooltip.transition()
-                            .duration(200)
-                            .style("opacity", .9)
-                        tooltip.html("Manufacturer:" + (d.data.manufacturer_code) + "<br>" + "Net Cost $" + (d.data.net_cost) + "<br>" + "Total Rebate $" + (d.data.total_rebate) + "<br>" + "Bid Price $" + (round(d.data.net_cost + d.data.total_rebate, 2)))
-                            // div.html("Product Details" + "<br>" + "Manufacturer:" + (d.numOneManufacturer) + "<br>" + "Generic Name:" + (d.generic_name) + "<br>" + "Priority:" + (d.numberOnePriority) + "<br>" + "Net Cost $" + (d.numberOneNetCost) + "<br>" + "Projected Savings $" + (d.numberOneSavings))
-                            .style("left", (d3.event.pageX) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px");
-                    })
-                    .on('mouseout', function(d) {
-                        tooltip.transition()
-                            .duration(500)
-                            .style("opacity", 0);
+                    function round(value, decimals) {
+                        return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+                    };
+                    // min/max
+                    var xExtent;
+                    var yExtent = d3.extent(data, function(d) {
+                        //console.log("Net_C", d.net_cost);
+                        //console.log("rebate", d.total_rebate);
+                        //console.log(d.net_cost + d.total_rebate);
+                        var nicer = d.net_cost + d.total_rebate;
+                        // console.log("THIS", round(nicer, 2));
+                        return round(nicer, 2)
                     });
-                // add the y Axis
-                svg.append("g")
-                    .call(d3.axisLeft(yScale));
-                svg.append("text")
-                    .attr("transform", "rotate(-90)")
-                    .attr("y", 0 - margin.left)
-                    .attr("x", 0 - (height / 2))
-                    .attr("dy", "1em")
-                    .style("text-anchor", "middle")
-                    .text("Bid Price ");
-            })
-        }
+                    //console.log("heigh", height)
+                    //console.log("y", yExtent)
+                    // domain
+                    var xScale = d3.scaleBand()
+                        .domain(data.map(function(d) {
+                            return d.priority;
+                        }))
+                        .range([0, width]);
+                    var yScale = d3.scaleLinear()
+                        .domain([0, yExtent[1]])
+                        .range([height, 0]);
+                    var x = d3.scaleBand()
+                        .domain(data.map(function(d) {
+                            return d.priority;
+                        }))
+                        .range([0, width]);
+                    var stack = d3.stack()
+                        .keys(["net_cost", "total_rebate"])
+                        .order(d3.stackOrderNone)
+                        .offset(d3.stackOffsetNone);
+                    var series = stack(data);
+                    var groups = svg.selectAll("g")
+                        .data(stack(data))
+                        .enter()
+                        .append("g");
+                    var rects = groups.selectAll("rect")
+                        .data(function(d) {
+                            return d
+                        })
+                        .enter()
+                        .append("rect")
+                        .attr("x", function(d) {
+                            return xScale(d.data.priority)
+                        })
+                        .attr("y", function(d) {
+                            if (d[0] != 0) {
+                                return yScale(round(d[0], 2))
+                            } else {
+                                var total = d.data.total_rebate + d.data.net_cost
+                                return yScale(round(d[1], 2)) - round(total, 2)
+                            };
+                        })
+                        .attr("width", xScale.bandwidth())
+                        .attr("height", function(d) {
+                            if (d[0] != 0) {
+                                return round(height - yScale(round(d[0], 2)), 2)
+                            } else {
+                                var total = d.data.net_cost + d.data.total_rebate;
+                                return round(height - round(yScale(round(d[1], 2)) - round(total, 2), 2), 2);
+                            };
+                        })
+                        .attr("id", function(d) {
+                            return d.priority
+                        })
+                        .style("fill", function(d) {
+                            if (d.data.priority == "CURRENT #1") {
+                                return "orange"
+                            }
+                            if (d.data.manufacturer_code == stackBarChartData[0].manufacturer_code) {
+                                console.log("Current", d);
+                                return "green"
+                            } else {
+                                return "blue"
+                            }
+                        })
+                        .style("fill-opacity", "0.5")
+                        .style("stroke", "black")
+                        .style("stroke-width", "1px")
+                        .on("mouseover", function(d) {
+                            tooltip.transition()
+                                .duration(200)
+                                .style("opacity", .9)
+                            tooltip.html("Manufacturer:" + (d.data.manufacturer_code) + "<br>" + "Net Cost $" + (d.data.net_cost) + "<br>" + "Total Rebate $" + (d.data.total_rebate) + "<br>" + "Bid Price $" + (round(d.data.net_cost + d.data.total_rebate, 2)))
+                                // div.html("Product Details" + "<br>" + "Manufacturer:" + (d.numOneManufacturer) + "<br>" + "Generic Name:" + (d.generic_name) + "<br>" + "Priority:" + (d.numberOnePriority) + "<br>" + "Net Cost $" + (d.numberOneNetCost) + "<br>" + "Projected Savings $" + (d.numberOneSavings))
+                                .style("left", (d3.event.pageX) + "px")
+                                .style("top", (d3.event.pageY - 28) + "px");
+                        })
+                        .on('mouseout', function(d) {
+                            tooltip.transition()
+                                .duration(500)
+                                .style("opacity", 0);
+                        });
+                    // add the y Axis
+                    svg.append("g")
+                        .call(d3.axisLeft(yScale));
+                    svg.append("text")
+                        .attr("transform", "rotate(-90)")
+                        .attr("y", 0 - margin.left)
+                        .attr("x", 0 - (height / 2))
+                        .attr("dy", "1em")
+                        .style("text-anchor", "middle")
+                        .text("Bid Price ");
+                })
+            }
 
         });
     </script>
-</body>    
+</body>
