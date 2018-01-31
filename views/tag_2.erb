@@ -81,6 +81,7 @@
             data.forEach(function(d) {
                 if (d.system_priority == 1) {
                     productDetails["id"] = (d.campaign_product_id);
+                    productDetails["primary_vender"] = (d.primary_vendor_code);
                     productDetails["generic_name"] = (d.generic_name);
                     productDetails["unitSold"] = (d.rolling_yearly_usage);
                     productDetails["numOneManufacturer"] = (d.bid_vender);
@@ -261,25 +262,22 @@
                 
                 
                 var stackBarChartData = [];
-                var primaryVenderData = []; 
+                
                 d.forEach(function(d) {
                     //console.log("this is the data that is in the foreach", d)
                     if (d.campaign_product_id == product.id) {
                         barChartHash = {};
-                        primaryHash = {};
                         barChartHash["manufacturer_code"] = d.bid_vender;
                         barChartHash["priority"] = d.system_priority;
                         barChartHash["net_cost"] = parseFloat(d.net_cost);
                         barChartHash["total_rebate"] = parseFloat(d.total_rebate);
-                        primaryHash["primary_vender"] = d.primary_vendor_code;
+                        barChartHash["primary_vender"] = (d.primary_vendor_code);
                         stackBarChartData.push(barChartHash);
-                        primaryVenderData.push(primaryHash);
                     };
                 })
                
                 //stackBarChartData.shift();
                 console.log("stackBarChartData", stackBarChartData);
-                console.log("primaryVenderData", primaryVenderData);
                 var data = stackBarChartData;
                 var tooltip = d3.select('body').append('div')
                     .attr('id', 'tooltip')
@@ -364,10 +362,12 @@
                         };
                     })
                     .attr("id", function(d) {
+                        //console.log("this is what i need to look at", d)
                         return d.priority
                     })
                     .style("fill", function(d) {
-                        if (d.data.primary_vendor_code == "CURRENT #1") {
+                        if (d.data.priority != "1") {
+                            console.log("look here", d.data.pr)
                             return "orange"
                         }
                         if (d.data.manufacturer_code == stackBarChartData[0].manufacturer_code) {
