@@ -188,7 +188,7 @@
                     d3.select(this).style("fill", "blue")
                     clearBarChart()
                     buildBarChart(product)
-                        //builtdPieChart(currentNetCostByProduct)
+                    builtdPieChart(currentNetCostByProduct)
                         // builtdDonutChart(currentNetCostByProduct)
                 })
 
@@ -416,5 +416,129 @@
             }
 
         });
+
+        function builtdPieChart(currentNetCostByProduct) {
+            //console.log("this is what we what to look at ", currentNetCostByProduct);
+            var svg = d3.select("#pieChart"),
+                width = +svg.attr("width"),
+                height = +svg.attr("height"),
+                radius = Math.min(width, height) / 2,
+                g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+            var color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+            var tooltip = d3.select('body').append('div')
+                .attr('id', 'tooltip')
+                .style('opacity', 0);
+
+            var pie = d3.pie()
+                .sort(null)
+                .value(function(d) {
+                    return d.value;
+                });
+
+            var path = d3.arc()
+                .outerRadius(radius - 10)
+                .innerRadius(0);
+
+            var label = d3.arc()
+                .outerRadius(radius - 50)
+                .innerRadius(radius - 50);
+
+            d3.csv("csv/r_X_csv.csv", function(d) {
+                var pieChartData = [];
+
+                d.forEach(function(d) {
+                    //console.log("this is d", d)
+                    if (d.priority == 1) {
+                        //console.log("this is the for each do", product.id);
+                        // console.log("thid is d", d);
+                        pieChartData.push(d)
+                    }
+
+                });
+                //console.log("pieChartData", pieChartData);
+                var priorityCount = {};
+                pieChartData.forEach(function(d) {
+                    if (d.manufacturer_code in priorityCount) {
+                        //console.log("post-results", priorityCount[d.manufacturer_code] += 1)
+                        priorityCount[d.manufacturer_code] += 1
+                    } else {
+                        //console.log("this is here", d)
+                        priorityCount[d.manufacturer_code] = 1
+                    };
+
+
+                });
+
+                function round(value, decimals) {
+                    return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+                };
+
+                function getSum(total, num) {
+                    return round(total, 2) + round(num, 2);
+                }
+
+                function getPercentage(total, num) {
+                    max = num * 100
+                    return round(max / total, 2)
+                }
+                //console.log("results", Object.keys(priorityCount))
+                //console.log("other results", Object.values(priorityCount))
+                //console.log("this is a hash", priorityCount);
+                var pieChartArray = [];
+                var pieKeys = Object.keys(priorityCount);
+                var pieValues = Object.values(priorityCount);
+                pieKeys.forEach(function(d, i) {
+                    var pieChartHash = {};
+                    //console.log(d)
+                    //console.log(pieValues[i])
+                    pieChartHash["manufacturer"] = d
+                    pieChartHash["value"] = pieValues[i]
+                    pieChartArray.push(pieChartHash)
+                });
+                console.log("lookatmenow", pieChartArray)
+
+                var arc = g.selectAll(".arc")
+                    .data(pie(pieChartArray))
+                    .enter().append("g")
+                    .attr("class", "arc")
+
+
+                arc.append("path")
+                    .attr("d", path)
+                    .attr("fill", function(d) {
+                        // console.log("look at me", d)
+                        return color(d.data.manufacturer);
+                    })
+                    .on('mouseover', function(d) {
+                        tooltip.transition()
+                            .duration(100)
+                            .style('opacity', .9);
+                        tooltip.html("Manufacturer:" + (d.data.manufacturer) + "<br>" + round(getPercentage(round(pieValues.reduce(getSum), 2), d.data.value), 2) + "%")
+                            .style('left', `${d3.event.pageX + 2}px`)
+                            .style('top', `${d3.event.pageY - 18}px`)
+                            .style("width", "150px")
+                            .style("height", "30px")
+                            .style("background", "lightsteelblue")
+                            .style("text-align", "center");
+                    })
+                    .on('mouseout', function(d) {
+                        tooltip.transition()
+                            .duration(400)
+                            .style('opacity', 0);
+                    })
+
+                arc.append("text")
+                    .attr("transform", function(d) {
+                        return "translate(" + label.centroid(d) + ")";
+                    })
+                    .attr("dy", "0.35em")
+                    .text(function(d) {
+                        return d.data.manufacturer
+                    }); //console.log("this is after each do", pieChartData);
+
+            });
+
+        };
     </script>
 </body>
