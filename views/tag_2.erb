@@ -84,6 +84,7 @@
             data.forEach(function(d) {
                 if (d.system_priority == 1) {
                     productDetails["id"] = (d.campaign_product_id);
+                    productDetails["primary_vender"] = (d.primary_vendor_code);
                     productDetails["generic_name"] = (d.generic_name);
                     productDetails["unitSold"] = (d.rolling_yearly_usage);
                     productDetails["primary_manufacturer"] = (d.primary_vendor_code);
@@ -190,7 +191,7 @@
                     d3.select(this).style("fill", "blue")
                     clearBarChart()
                     buildBarChart(product)
-                        //builtdPieChart(currentNetCostByProduct)
+                    builtdPieChart(currentNetCostByProduct)
                         // builtdDonutChart(currentNetCostByProduct)
                 })
 
@@ -419,144 +420,128 @@
 
         });
 
-        function builtdDonutChart(currentNetCostByProduct) {
-            function round(value, decimals) {
-                return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
-            };
-            console.log(currentNetCostByProduct)
-            var doughnutChartCurrent = [];
-            var doughnutChart1 = [];
-            var percentage1Total = [];
-            var percentageCurrentTotal = [];
-            currentNetCostByProduct.forEach(function(d) {
-                // var doughnutChartHashCurrent = {};
-                // var doughnutChartHash = {};
-                // doughnutChartHash["manufacturer"] = d.numOneManufacturer;
-                // doughnutChartHashCurrent["manufacturer"] = d.current_manufacturer;
-                // doughnutChartHash["total"] = round(parseFloat(d.unitSold) * parseFloat(d.numberOneNetCost), 2);
-                // doughnutChartHashCurrent["total"] = round(parseFloat(d.unitSold) * parseFloat(d.currentNumberOneNetCost), 2);
-                // doughnutChartCurrent.push(doughnutChartHashCurrent);
-                // doughnutChart1.push(doughnutChartHash);
-            })
+        function builtdPieChart(currentNetCostByProduct) {
+            //console.log("this is what we what to look at ", currentNetCostByProduct);
+            var svg = d3.select("#pieChart"),
+                width = +svg.attr("width"),
+                height = +svg.attr("height"),
+                radius = Math.min(width, height) / 2,
+                g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-            function getSum(total, num) {
-                return round(total, 2) + round(num, 2);
-            }
-
-            function getPercentage(total, num) {
-                max = num * 1000
-                return round(max / total, 2)
-            }
-            currentBeforeConfigure = {};
-            oneBeforeConfigure = {};
-            doughnutChart1.forEach(function(d) {
-                if (d.manufacturer in oneBeforeConfigure) {
-                    oneBeforeConfigure[d.manufacturer] += d.total
-                } else {
-                    oneBeforeConfigure[d.manufacturer] = d.total
-                }
-            })
-            doughnutChartCurrent.forEach(function(d) {
-                if (d.manufacturer in currentBeforeConfigure) {
-                    currentBeforeConfigure[d.manufacturer] += d.total
-                } else {
-                    currentBeforeConfigure[d.manufacturer] = parseFloat(d.total)
-                }
-            })
-            var doughnutChartCurrent = [];
-            var doughnutChart1 = [];
-            var currentKeys = Object.keys(currentBeforeConfigure);
-            var currentValues = Object.values(currentBeforeConfigure);
-            // console.log("Values", currentValues)
-            // console.log(currentValues.reduce(getSum))
-            // console.log(round(getPercentage(currentValues.reduce(getSum), currentValues[2]), 2))
-            currentKeys.forEach(function(d, i) {
-                var doughnutChartHashCurrent = {};
-                doughnutChartHashCurrent["manufacturer"] = d
-                doughnutChartHashCurrent["total"] = currentValues[i]
-                doughnutChartCurrent.push(doughnutChartHashCurrent)
-            });
-            var oneKeys = Object.keys(oneBeforeConfigure);
-            var oneValues = Object.values(oneBeforeConfigure);
-            oneKeys.forEach(function(d, i) {
-                var doughnutChartHash = {};
-                doughnutChartHash["manufacturer"] = d
-                doughnutChartHash["total"] = oneValues[i]
-                doughnutChart1.push(doughnutChartHash)
-            });
-
-            // console.log("current", currentBeforeConfigure)
-            // console.log("one", oneBeforeConfigure)
-            // console.log("Other", doughnutChartCurrent)
-            // console.log("here", doughnutChart1)
-            var dataset = doughnutChart1
+            var color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
             var tooltip = d3.select('body').append('div')
                 .attr('id', 'tooltip')
                 .style('opacity', 0);
 
-            var width = 360;
-            var height = 360;
-            var radius = Math.min(width, height) / 2;
-
-            var color = d3.scaleOrdinal(d3.schemeCategory10);
-
-            var svg = d3.select('#donutChart')
-                .append('svg')
-                .attr('width', width)
-                .attr('height', height)
-                .append('g')
-                .attr('transform', 'translate(' + (width / 2) +
-                    ',' + (height / 2) + ')');
-
-            var donutWidth = 75;
-
-            var arc = d3.arc()
-                .innerRadius(radius - donutWidth)
-                .outerRadius(radius);
-
-
-
             var pie = d3.pie()
+                .sort(null)
                 .value(function(d) {
-                    return d.total;
-                })
-                .sort(null);
+                    return d.value;
+                });
 
-            var path = svg.selectAll('path')
-                .data(pie(dataset))
-                .enter()
-                .append('path')
-                .attr('d', arc)
-                .attr('fill', function(d, i) {
-                    return color(d.data.manufacturer);
+            var path = d3.arc()
+                .outerRadius(radius - 10)
+                .innerRadius(0);
+
+            var label = d3.arc()
+                .outerRadius(radius - 50)
+                .innerRadius(radius - 50);
+
+            d3.csv("csv/r_X_csv.csv", function(d) {
+                var pieChartData = [];
+
+                d.forEach(function(d) {
+                    //console.log("this is d", d)
+                    if (d.priority == 1) {
+                        //console.log("this is the for each do", product.id);
+                        // console.log("thid is d", d);
+                        pieChartData.push(d)
+                    }
+
+                });
+                //console.log("pieChartData", pieChartData);
+                var priorityCount = {};
+                pieChartData.forEach(function(d) {
+                    if (d.manufacturer_code in priorityCount) {
+                        //console.log("post-results", priorityCount[d.manufacturer_code] += 1)
+                        priorityCount[d.manufacturer_code] += 1
+                    } else {
+                        //console.log("this is here", d)
+                        priorityCount[d.manufacturer_code] = 1
+                    };
+
 
                 });
 
+                function round(value, decimals) {
+                    return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+                };
 
-            path.on('mouseover', function(d) {
-                var total = d3.sum(dataset.map(function(d) {
-                    return d.total;
-                }));
-                var percent = Math.round(1000 * d.data.total / total) / 10;
-                tooltip.transition()
-                    .duration(200)
-                    .style("opacity", .9)
-                tooltip.html("Manufacturer:" + (d.data.manufacturer) + "<br>" + "Total $" + (d.data.total) + "<br>" + round(getPercentage(currentValues.reduce(getSum), d.data.total), 2) + "%")
-                    .style("left", (d3.event.pageX) + "px")
-                    .style("top", (d3.event.pageY - 28) + "px")
-                    .style("width", "150px")
-                    .style("height", "50px")
-                    .style("background", "rgba(0, 0, 0, 0.8)")
-                    .style("color", "white")
-                    .style("text-align", "center");
+                function getSum(total, num) {
+                    return round(total, 2) + round(num, 2);
+                }
+
+                function getPercentage(total, num) {
+                    max = num * 100
+                    return round(max / total, 2)
+                }
+                //console.log("results", Object.keys(priorityCount))
+                //console.log("other results", Object.values(priorityCount))
+                //console.log("this is a hash", priorityCount);
+                var pieChartArray = [];
+                var pieKeys = Object.keys(priorityCount);
+                var pieValues = Object.values(priorityCount);
+                pieKeys.forEach(function(d, i) {
+                    var pieChartHash = {};
+                    //console.log(d)
+                    //console.log(pieValues[i])
+                    pieChartHash["manufacturer"] = d
+                    pieChartHash["value"] = pieValues[i]
+                    pieChartArray.push(pieChartHash)
+                });
+                console.log("lookatmenow", pieChartArray)
+
+                var arc = g.selectAll(".arc")
+                    .data(pie(pieChartArray))
+                    .enter().append("g")
+                    .attr("class", "arc")
+
+
+                arc.append("path")
+                    .attr("d", path)
+                    .attr("fill", function(d) {
+                        // console.log("look at me", d)
+                        return color(d.data.manufacturer);
+                    })
+                    .on('mouseover', function(d) {
+                        tooltip.transition()
+                            .duration(100)
+                            .style('opacity', .9);
+                        tooltip.html("Manufacturer:" + (d.data.manufacturer) + "<br>" + round(getPercentage(round(pieValues.reduce(getSum), 2), d.data.value), 2) + "%")
+                            .style('left', `${d3.event.pageX + 2}px`)
+                            .style('top', `${d3.event.pageY - 18}px`)
+                            .style("width", "150px")
+                            .style("height", "30px")
+                            .style("background", "lightsteelblue")
+                            .style("text-align", "center");
+                    })
+                    .on('mouseout', function(d) {
+                        tooltip.transition()
+                            .duration(400)
+                            .style('opacity', 0);
+                    })
+
+                arc.append("text")
+                    .attr("transform", function(d) {
+                        return "translate(" + label.centroid(d) + ")";
+                    })
+                    .attr("dy", "0.35em")
+                    .text(function(d) {
+                        return d.data.manufacturer
+                    }); //console.log("this is after each do", pieChartData);
 
             });
 
-            path.on('mouseout', function() {
-                tooltip.transition()
-                    .duration(500)
-                    .style("opacity", 0);
-            });
         };
     </script>
 </body>

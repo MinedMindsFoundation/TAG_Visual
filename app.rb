@@ -2,6 +2,7 @@ require 'sinatra'
 require 'csv'
 require 'json'
 require 'pg'
+require 'json'
 require_relative 'database_func.rb'
 require_relative 'csv_func.rb'
 load './local_env.rb' if File.exist?('./local_env.rb')

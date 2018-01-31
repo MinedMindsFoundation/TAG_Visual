@@ -26,7 +26,7 @@ def getinfo()
     }
     db= PG::Connection.new(db_params)
     data = [] 
-	db.exec( "SELECT * FROM tag_rx_table" ) do |result|
+	db.exec( "SELECT  * FROM tag_rx_table" ) do |result|
 	      result.each do |row|
 	          data << row.values
 	        end
