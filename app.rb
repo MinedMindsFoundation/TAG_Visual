@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'csv'
+require 'json'
 require 'pg'
 require_relative 'database_func.rb'
 require_relative 'csv_func.rb'
@@ -16,7 +17,8 @@ post '/choice' do
     elsif choice == "Tag_2"
         check_connection()
         data = getinfo()
-        writecsv(data)
+        # writecsv(data)
+        writejson(data)
     #   p  "#{data}"
         erb :tag_2
     end

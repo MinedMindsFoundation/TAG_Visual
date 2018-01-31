@@ -72,6 +72,9 @@
     <script src="http://d3js.org/d3.v4.min.js"></script>
     <script>
         // Create data
+        d3.json('json/tag_rx.json', function(data) {
+            console.log("JSON DATA", data)
+        })
         d3.csv("csv/tag_rx.csv", function(error, data) {
             console.log("data", data)
             var unitSoldArray = [];
@@ -415,5 +418,145 @@
             }
 
         });
+
+        function builtdDonutChart(currentNetCostByProduct) {
+            function round(value, decimals) {
+                return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+            };
+            console.log(currentNetCostByProduct)
+            var doughnutChartCurrent = [];
+            var doughnutChart1 = [];
+            var percentage1Total = [];
+            var percentageCurrentTotal = [];
+            currentNetCostByProduct.forEach(function(d) {
+                // var doughnutChartHashCurrent = {};
+                // var doughnutChartHash = {};
+                // doughnutChartHash["manufacturer"] = d.numOneManufacturer;
+                // doughnutChartHashCurrent["manufacturer"] = d.current_manufacturer;
+                // doughnutChartHash["total"] = round(parseFloat(d.unitSold) * parseFloat(d.numberOneNetCost), 2);
+                // doughnutChartHashCurrent["total"] = round(parseFloat(d.unitSold) * parseFloat(d.currentNumberOneNetCost), 2);
+                // doughnutChartCurrent.push(doughnutChartHashCurrent);
+                // doughnutChart1.push(doughnutChartHash);
+            })
+
+            function getSum(total, num) {
+                return round(total, 2) + round(num, 2);
+            }
+
+            function getPercentage(total, num) {
+                max = num * 1000
+                return round(max / total, 2)
+            }
+            currentBeforeConfigure = {};
+            oneBeforeConfigure = {};
+            doughnutChart1.forEach(function(d) {
+                if (d.manufacturer in oneBeforeConfigure) {
+                    oneBeforeConfigure[d.manufacturer] += d.total
+                } else {
+                    oneBeforeConfigure[d.manufacturer] = d.total
+                }
+            })
+            doughnutChartCurrent.forEach(function(d) {
+                if (d.manufacturer in currentBeforeConfigure) {
+                    currentBeforeConfigure[d.manufacturer] += d.total
+                } else {
+                    currentBeforeConfigure[d.manufacturer] = parseFloat(d.total)
+                }
+            })
+            var doughnutChartCurrent = [];
+            var doughnutChart1 = [];
+            var currentKeys = Object.keys(currentBeforeConfigure);
+            var currentValues = Object.values(currentBeforeConfigure);
+            // console.log("Values", currentValues)
+            // console.log(currentValues.reduce(getSum))
+            // console.log(round(getPercentage(currentValues.reduce(getSum), currentValues[2]), 2))
+            currentKeys.forEach(function(d, i) {
+                var doughnutChartHashCurrent = {};
+                doughnutChartHashCurrent["manufacturer"] = d
+                doughnutChartHashCurrent["total"] = currentValues[i]
+                doughnutChartCurrent.push(doughnutChartHashCurrent)
+            });
+            var oneKeys = Object.keys(oneBeforeConfigure);
+            var oneValues = Object.values(oneBeforeConfigure);
+            oneKeys.forEach(function(d, i) {
+                var doughnutChartHash = {};
+                doughnutChartHash["manufacturer"] = d
+                doughnutChartHash["total"] = oneValues[i]
+                doughnutChart1.push(doughnutChartHash)
+            });
+
+            // console.log("current", currentBeforeConfigure)
+            // console.log("one", oneBeforeConfigure)
+            // console.log("Other", doughnutChartCurrent)
+            // console.log("here", doughnutChart1)
+            var dataset = doughnutChart1
+            var tooltip = d3.select('body').append('div')
+                .attr('id', 'tooltip')
+                .style('opacity', 0);
+
+            var width = 360;
+            var height = 360;
+            var radius = Math.min(width, height) / 2;
+
+            var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+            var svg = d3.select('#donutChart')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height)
+                .append('g')
+                .attr('transform', 'translate(' + (width / 2) +
+                    ',' + (height / 2) + ')');
+
+            var donutWidth = 75;
+
+            var arc = d3.arc()
+                .innerRadius(radius - donutWidth)
+                .outerRadius(radius);
+
+
+
+            var pie = d3.pie()
+                .value(function(d) {
+                    return d.total;
+                })
+                .sort(null);
+
+            var path = svg.selectAll('path')
+                .data(pie(dataset))
+                .enter()
+                .append('path')
+                .attr('d', arc)
+                .attr('fill', function(d, i) {
+                    return color(d.data.manufacturer);
+
+                });
+
+
+            path.on('mouseover', function(d) {
+                var total = d3.sum(dataset.map(function(d) {
+                    return d.total;
+                }));
+                var percent = Math.round(1000 * d.data.total / total) / 10;
+                tooltip.transition()
+                    .duration(200)
+                    .style("opacity", .9)
+                tooltip.html("Manufacturer:" + (d.data.manufacturer) + "<br>" + "Total $" + (d.data.total) + "<br>" + round(getPercentage(currentValues.reduce(getSum), d.data.total), 2) + "%")
+                    .style("left", (d3.event.pageX) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px")
+                    .style("width", "150px")
+                    .style("height", "50px")
+                    .style("background", "rgba(0, 0, 0, 0.8)")
+                    .style("color", "white")
+                    .style("text-align", "center");
+
+            });
+
+            path.on('mouseout', function() {
+                tooltip.transition()
+                    .duration(500)
+                    .style("opacity", 0);
+            });
+        };
     </script>
 </body>
