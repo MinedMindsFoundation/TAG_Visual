@@ -69,13 +69,13 @@
     <svg id="pieChart" width="370" height="370"></svg>
     <svg id="stackedChart" width="700" height="500"></svg>
     <svg id="donutChart" width="370" height="370"></svg>
-
+<form><%data%></form>
 
     <script src="http://d3js.org/d3.v4.min.js"></script>
     <script>
         // Create data
-        
-        d3.json("json/tag_rx.json", function(error, data) {
+
+       data.forEach(function (data) {
             console.log("data", data)
             var unitSoldArray = [];
             var savingsArray = [];
@@ -420,7 +420,7 @@
 
         });
 
-         function builtdPieChart(currentNetCostByProduct) {
+        function builtdPieChart(currentNetCostByProduct) {
             //console.log("this is what we what to look at ", currentNetCostByProduct);
             var svg = d3.select("#pieChart"),
                 width = +svg.attr("width"),
@@ -455,7 +455,7 @@
                     //console.log("this is d", d)
                     if (d.system_priority == "1") {
                         //console.log("this is the for each do", product.id);
-                         //console.log("thid is d", d);
+                        //console.log("thid is d", d);
                         pieChartData.push(d)
                     }
 

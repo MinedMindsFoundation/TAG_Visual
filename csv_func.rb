@@ -34,3 +34,38 @@ def writejson(info)
         f.write(array.to_json)
     end
 end
+
+def data_converter(data)
+    array = []
+    data.each do |values|
+        tempHash = {
+        "campaign_id" => "#{values[0]}",
+        "campaign_product_id" => "#{values[1]}",
+        "generic_name" => "#{values[2]}",
+        "compare_to" => "#{values[3]}",
+        "strength" => "#{values[4]}",
+        "form" => "#{values[5]}",
+        "size" => "#{values[6]}",
+        "gold_standard_id" => "#{values[7]}",
+        "rolling_yearly_usage" => "#{values[8]}",
+        "primary_vendor_code" => "#{values[9]}",
+        "primary_ndc" => "#{values[10]}",
+        "primary_bid_price" => "#{values[11]}",
+        "primary_total_rebate" => "#{values[12]}",
+        "primary_net_cost" => "#{values[13]}",
+        "annual_gross_spend" => "#{values[14]}",
+        "annual_net_spend" => "#{values[15]}",
+        "annual_rebate" => "#{values[16]}",
+        "bid_vendor" => "#{values[17]}",
+        "ndc" => "#{values[18]}",
+        "bid_price" => "#{values[19]}",
+        "invoice_cost" => "#{values[20]}",
+        "total_rebate" => "#{values[21]}",
+        "net_cost" => "#{values[22]}",
+        "annual_savings" => "#{values[23]}",
+        "system_priority" => "#{values[24]}",
+        }
+        array << tempHash
+    end
+    array
+end
