@@ -74,6 +74,8 @@
     <script src="http://d3js.org/d3.v4.min.js"></script>
     <script>
         // Create data
+        var converted_data = '<%=converted_data%>';
+        console.log("converted", converted_data)
 
         d3.json("json/tag_rx.json", function(error, data) {
             console.log("data", data)
