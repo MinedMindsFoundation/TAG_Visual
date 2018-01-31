@@ -22,6 +22,6 @@ post '/choice' do
        converted_data = data_converter(data)
              p "#{data}"
         
-        erb :tag_2, locals: {data: converted_data}
+        erb :tag_2, locals: {converted_data: converted_data}
     end
 end
