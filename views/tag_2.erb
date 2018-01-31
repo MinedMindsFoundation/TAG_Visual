@@ -359,7 +359,7 @@
                                 return yScale(round(d[0], 2))
                             } else {
                                 var total = d.data.total_rebate + d.data.net_cost
-                                return yScale(round(d[1], 2)) - round(total, 2)
+                                return yScale(round(total, 2))
                             };
                         })
                         .attr("width", xScale.bandwidth())
@@ -368,7 +368,7 @@
                                 return round(height - yScale(round(d[0], 2)), 2)
                             } else {
                                 var total = d.data.net_cost + d.data.total_rebate;
-                                return round(height - round(yScale(round(d[1], 2)) - round(total, 2), 2), 2);
+                                return round(height - yScale(round(total, 2)), 2);
                             };
                         })
                         .attr("id", function(d) {
