@@ -564,6 +564,13 @@ function tag_js(converted) {
             .append('g')
             .attr('transform', 'translate(' + (width / 2) +
                 ',' + (height / 2) + ')');
+        svg.append("text")
+            .attr("id", "dChartTitle")
+            .attr("y", -39)
+            .attr("text-anchor", "middle")
+            .style("font-size", "16px")
+            .style("text-decoration", "underline")
+            .text("You pick name Jon..lol");
 
         var donutWidth = 75;
 
@@ -606,7 +613,6 @@ function tag_js(converted) {
                 .attr('r', radius * 0.55) // radius of tooltip circle
                 .style('fill', color(d.data.manufacturer)) // colour based on category mouse is over
                 .style('fill-opacity', 0.35);
-
         });
 
         path.on('mouseout', function() {
