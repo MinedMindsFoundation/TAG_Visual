@@ -35,7 +35,7 @@ function tag_js(converted) {
         .style('opacity', 0);
 
     var margin = {
-        top: 20,
+        top: 50,
         right: 255,
         bottom: 30,
         left: 40
@@ -229,7 +229,7 @@ function tag_js(converted) {
             .attr('id', 'tooltip')
             .style('opacity', 0);
         var margin = {
-            top: 0,
+            top: 40,
             right: 40,
             bottom: 40,
             left: 40
@@ -372,30 +372,23 @@ function tag_js(converted) {
             .attr("text-anchor", "middle")
             .style("font-size", "16px")
             .style("text-decoration", "underline")
-            .text("This can be a Name");
-
+            .text("Pie Chart");
         var color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
         var tooltip = d3.select('body').append('div')
             .attr('id', 'tooltip')
             .style('opacity', 0);
-
         var pie = d3.pie()
             .sort(null)
             .value(function(d) {
                 return d.value;
             });
-
         var path = d3.arc()
             .outerRadius(radius - 10)
             .innerRadius(0);
-
         var label = d3.arc()
             .outerRadius(radius - 50)
             .innerRadius(radius - 50);
-
-
         var pieChartData = [];
-
         converted.forEach(function(d) {
             //console.log("this is d", d)
             if (d.system_priority == "1") {
@@ -403,7 +396,6 @@ function tag_js(converted) {
                 //console.log("thid is d", d);
                 pieChartData.push(d)
             }
-
         });
         //console.log("pieChartData", pieChartData);
         var priorityCount = {};
@@ -415,8 +407,6 @@ function tag_js(converted) {
                 //console.log("this is here", d)
                 priorityCount[d.bid_vendor] = 1
             };
-
-
         });
 
         function round(value, decimals) {
@@ -446,13 +436,10 @@ function tag_js(converted) {
             pieChartArray.push(pieChartHash)
         });
         console.log("lookatmenow", pieChartArray)
-
         var arc = g.selectAll(".arc")
             .data(pie(pieChartArray))
             .enter().append("g")
             .attr("class", "arc")
-
-
         arc.append("path")
             .attr("d", path)
             .attr("fill", function(d) {
@@ -476,7 +463,6 @@ function tag_js(converted) {
                     .duration(400)
                     .style('opacity', 0);
             })
-
         arc.append("text")
             .attr("transform", function(d) {
                 return "translate(" + label.centroid(d) + ")";
@@ -485,8 +471,6 @@ function tag_js(converted) {
             .text(function(d) {
                 return d.data.manufacturer
             }); //console.log("this is after each do", pieChartData);
-
-
     };
 
     function builtdDonutChart(currentNetCostByProduct) {
@@ -614,7 +598,7 @@ function tag_js(converted) {
             svg.append('text')
                 .attr('class', 'toolCircle')
                 .attr('dy', -15) // hard-coded. can adjust this to adjust text vertical alignment in tooltip
-                .html('<tspan x="0">' + "Manufacturer" + ': ' + d.data.manufacturer + '</tspan>' + '<tspan x="0" dy="1.2em">' + "Total $" + (d.data.total) + "</tspan>" + '<tspan x="0" dy="1.3em">' + round(getPercentage(currentValues.reduce(getSum), d.data.total), 2) + "%" + "</tspan>") // add text to the circle.
+                .html('<tspan x="0">' + "Manufacturer" + ': ' + d.data.manufacturer + '</tspan>' + '<tspan x="0" dy="1.2em">' + "Total $" + (d.data.total) + "</tspan>" + '<tspan x="0" dy="1.5em">' + round(getPercentage(currentValues.reduce(getSum), d.data.total), 2) + "%" + "</tspan>") // add text to the circle.
                 .style('font-size', '.9em')
                 .style('text-anchor', 'middle');
             svg.append('circle')
