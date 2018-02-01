@@ -363,9 +363,16 @@ function tag_js(converted) {
         //console.log("this is what we what to look at ", currentNetCostByProduct);
         var svg = d3.select("#pieChart"),
             width = +svg.attr("width"),
-            height = +svg.attr("height"),
+            height = +svg.attr("height") + 20,
             radius = Math.min(width, height) / 2,
             g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+        svg.append("text")
+            .attr("x", (width / 2))
+            .attr("y", 11)
+            .attr("text-anchor", "middle")
+            .style("font-size", "16px")
+            .style("text-decoration", "underline")
+            .text("This can be a Name");
 
         var color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
         var tooltip = d3.select('body').append('div')
@@ -607,7 +614,7 @@ function tag_js(converted) {
             svg.append('text')
                 .attr('class', 'toolCircle')
                 .attr('dy', -15) // hard-coded. can adjust this to adjust text vertical alignment in tooltip
-                .html('<tspan x="0">' + "Manufacturer" + ': ' + d.data.manufacturer + '</tspan>' + '<tspan x="0" dy="1.2em">' + "Total $" + (d.data.total) + "</tspan>" + '<tspan x="0" dy="1.5em">' + round(getPercentage(currentValues.reduce(getSum), d.data.total), 2) + "%" + "</tspan>") // add text to the circle.
+                .html('<tspan x="0">' + "Manufacturer" + ': ' + d.data.manufacturer + '</tspan>' + '<tspan x="0" dy="1.2em">' + "Total $" + (d.data.total) + "</tspan>" + '<tspan x="0" dy="1.3em">' + round(getPercentage(currentValues.reduce(getSum), d.data.total), 2) + "%" + "</tspan>") // add text to the circle.
                 .style('font-size', '.9em')
                 .style('text-anchor', 'middle');
             svg.append('circle')
