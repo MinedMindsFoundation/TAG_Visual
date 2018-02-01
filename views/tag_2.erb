@@ -675,25 +675,25 @@
                     return d.total;
                 }));
                 var percent = Math.round(1000 * d.data.total / total) / 10;
-                tooltip.transition()
-                    .duration(200)
-                    .style("opacity", .9)
-                tooltip.html("Manufacturer:" + (d.data.manufacturer) + "<br>" + "Total $" + (d.data.total) + "<br>" + round(getPercentage(currentValues.reduce(getSum), d.data.total), 2) + "%")
-                    .style("left", (d3.event.pageX) + "px")
-                    .style("top", (d3.event.pageY - 28) + "px")
-                    .style("width", "150px")
-                    .style("height", "50px")
-                    .style("background", "rgba(0, 0, 0, 0.8)")
-                    .style("color", "white")
-                    .style("text-align", "center");
+                svg.append('text')
+                        .attr('class', 'toolCircle')
+                        .attr('dy', -15) // hard-coded. can adjust this to adjust text vertical alignment in tooltip
+                        .html('<tspan x="0">' + "Manufacturer" + ': ' + d.data.manufacturer + '</tspan>' + '<tspan x="0" dy="1.2em">' + "Total $" + (d.data.total) + "</tspan>" + '<tspan x="0" dy="1.5em">' + round(getPercentage(currentValues.reduce(getSum), d.data.total), 2) + "%" + "</tspan>") // add text to the circle.
+                        .style('font-size', '.9em')
+                        .style('text-anchor', 'middle'); 
+                svg.append('circle')
+                        .attr('class', 'toolCircle')
+                        .attr('r', radius * 0.55) // radius of tooltip circle
+                        .style('fill', color(d.data.manufacturer)) // colour based on category mouse is over
+                        .style('fill-opacity', 0.35);
 
             });
 
-            path.on('mouseout', function() {
-                tooltip.transition()
-                    .duration(500)
-                    .style("opacity", 0);
+            path.on('mouseout', function () {
+                    d3.selectAll('.toolCircle').remove();
             });
         };
+
+         
     </script>
 </body>
