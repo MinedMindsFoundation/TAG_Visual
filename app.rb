@@ -20,7 +20,7 @@ post '/choice' do
         data = getinfo()
         #  writejson(data)
        converted_data = data_converter(data)
-             p "#{data}"
+          
         
         erb :tag_2, locals: {converted_data: converted_data}
     end
