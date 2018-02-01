@@ -276,7 +276,7 @@
 
             function buildBarChart(product) {
                 console.log("this is the data from th onclick", product);
-                d3.json("json/tag_rx.json", function(d) {
+                
 
 
                     var stackBarChartData = [];
@@ -286,7 +286,7 @@
                     primaryVendorData["net_cost"] = parseFloat(product.primary_net_cost);
                     primaryVendorData["total_rebate"] = parseFloat(product.primary_total_rebate);
                     stackBarChartData.push(primaryVendorData)
-                    d.forEach(function(d) {
+                    converted.forEach(function(d) {
                         //console.log("this is the data that is in the foreach", d)
                         if (d.campaign_product_id == product.id) {
                             barChartHash = {};
@@ -426,7 +426,6 @@
                         .attr("dy", "1em")
                         .style("text-anchor", "middle")
                         .text("Bid Price ");
-                })
             }
 
        
@@ -458,11 +457,10 @@
                 .outerRadius(radius - 50)
                 .innerRadius(radius - 50);
 
-            d3.json("json/tag_rx.json", function(d) {
-                console.log("this is the pie data", d);
+            
                 var pieChartData = [];
 
-                d.forEach(function(d) {
+                converted.forEach(function(d) {
                     //console.log("this is d", d)
                     if (d.system_priority == "1") {
                         //console.log("this is the for each do", product.id);
@@ -552,7 +550,6 @@
                         return d.data.manufacturer
                     }); //console.log("this is after each do", pieChartData);
 
-            });
 
         };
 
