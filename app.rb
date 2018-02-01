@@ -18,10 +18,11 @@ post '/choice' do
     elsif choice == "Tag_2"
         check_connection()
         data = getinfo()
-        #  writejson(data)
-       converted_data = data_converter(data)
-          
-        
-        erb :tag_2, locals: {converted_data: converted_data}
+        # writecsv(data)
+        # writejson(data)
+        converted_data = data_converter(data)
+        # p converted_data
+    #   p  "#{data}"
+        erb :tag_2, locals:{converted_data:converted_data}
     end
 end

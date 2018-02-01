@@ -65,9 +65,9 @@
 </head>
 
 <body>
-<form>
-<input id='bill' type="text" value='<%=converted_data%>' style="display: block">
-</form>
+    <form>
+        <input type="hidden" id="converted_data" value='<%=converted_data%>'>
+    </form>
     <svg id="scatter" width="700" height="500"></svg>
     <svg id="pieChart" width="370" height="370"></svg>
     <svg id="stackedChart" width="700" height="500"></svg>
@@ -77,21 +77,22 @@
     <script src="http://d3js.org/d3.v4.min.js"></script>
     <script>
         // Create data
-        var billy = document.getElementById("bill");
-       var data = billy.value;
+        // var converted = document.getElementById("converted_data")
+        var converted = <%=converted_data%>;
+        // var converted_data = converted.value
+        // console.log(converted_data)
+        // console.log(converted_data.to_json)
+        console.log("converted", converted);
         
-
-                console.log(result);
-                    
+        // console.log(converted_data)
+        // var json_data = JSON.parse(converted_data)
         
-
-        d3.json("json/tag_rx.json", function(error, data) {
-            console.log("data", data)
+            console.log(typeof data)
             var unitSoldArray = [];
             var savingsArray = [];
             var productDetails = {};
             var currentNetCostByProduct = [];
-            data.forEach(function(d) {
+            converted.forEach(function(d) {
                 if (d.system_priority == 1) {
                     productDetails["id"] = (d.campaign_product_id);
                     productDetails["primary_vendor"] = (d.primary_vendor_code);
@@ -428,7 +429,7 @@
                 })
             }
 
-        });
+       
 
         function builtdPieChart(currentNetCostByProduct) {
             //console.log("this is what we what to look at ", currentNetCostByProduct);

@@ -67,5 +67,5 @@ def data_converter(data)
         }
         array << tempHash
     end
-    array
+    array.to_json
 end
