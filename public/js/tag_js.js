@@ -132,6 +132,13 @@ function tag_js(converted) {
         .attr("x", width)
         .attr("y", height - 8)
         .text("Savings");
+    svg.append("text")
+        .attr("x", (width / 2))
+        .attr("y", 0 - (margin.top / 2))
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("text-decoration", "underline")
+        .text("This can be a Name");
     // y axis
     svg.append("g")
         .attr("class", "y axis")
@@ -341,6 +348,13 @@ function tag_js(converted) {
             .attr("dy", "1em")
             .style("text-anchor", "middle")
             .text("Bid Price ");
+        svg.append("text")
+            .attr("x", (width / 2))
+            .attr("y", 0 - (margin.top / 2))
+            .attr("text-anchor", "middle")
+            .style("font-size", "16px")
+            .style("text-decoration", "underline")
+            .text("This can be a name");
     }
 
 
