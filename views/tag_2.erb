@@ -120,7 +120,7 @@
                 .style('opacity', 0);
 
             var margin = {
-                top: 20,
+                top: 40,
                 right: 255,
                 bottom: 30,
                 left: 40
@@ -217,6 +217,13 @@
                 .attr("x", width)
                 .attr("y", height - 8)
                 .text("Savings");
+            svg.append("text")
+                .attr("x", (width / 2))             
+                .attr("y", 0 - (margin.top / 2))
+                .attr("text-anchor", "middle")  
+                .style("font-size", "16px") 
+                .style("text-decoration", "underline")  
+                .text("This can be a Name");
             // y axis
             svg.append("g")
                 .attr("class", "y axis")
@@ -307,7 +314,7 @@
                         .attr('id', 'tooltip')
                         .style('opacity', 0);
                     var margin = {
-                        top: 0,
+                        top: 30,
                         right: 40,
                         bottom: 40,
                         left: 40
@@ -426,6 +433,13 @@
                         .attr("dy", "1em")
                         .style("text-anchor", "middle")
                         .text("Bid Price ");
+                    svg.append("text")
+                        .attr("x", (width / 2))             
+                        .attr("y", 0 - (margin.top / 2))
+                        .attr("text-anchor", "middle")  
+                        .style("font-size", "16px") 
+                        .style("text-decoration", "underline")  
+                        .text("This can be a name");
             }
 
        
@@ -437,6 +451,11 @@
                 height = +svg.attr("height"),
                 radius = Math.min(width, height) / 2,
                 g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+            svg.append('text')
+                .attr('class', 'head')
+                .attr('x', 10)
+                .attr('y', 10)
+                .text('You pick the name Jon..lol');
 
             var color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
             var tooltip = d3.select('body').append('div')
@@ -510,8 +529,7 @@
                     pieChartArray.push(pieChartHash)
                 });
                 console.log("lookatmenow", pieChartArray)
-
-                var arc = g.selectAll(".arc")
+            var arc = g.selectAll(".arc")
                     .data(pie(pieChartArray))
                     .enter().append("g")
                     .attr("class", "arc")
@@ -548,7 +566,8 @@
                     .attr("dy", "0.35em")
                     .text(function(d) {
                         return d.data.manufacturer
-                    }); //console.log("this is after each do", pieChartData);
+                    }); 
+                    
 
 
         };
