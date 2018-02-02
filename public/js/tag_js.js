@@ -187,7 +187,7 @@ function tag_js(converted) {
     }
 
     function clearBarChart() {
-        d3.select("#barChart").remove()
+        d3.select("#barChart").remove();
     }
 
 
