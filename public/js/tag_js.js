@@ -136,7 +136,7 @@ function tag_js(converted) {
         .attr("x", (width / 2))
         .attr("y", 0 - (margin.top / 2))
         .attr("text-anchor", "middle")
-        .style("font-size", "16px")
+        .style("font-size", "25px")
         .style("text-decoration", "underline")
         .text("This can be a Name");
     // y axis
@@ -352,7 +352,7 @@ function tag_js(converted) {
             .attr("x", (width / 2))
             .attr("y", 0 - (margin.top / 2))
             .attr("text-anchor", "middle")
-            .style("font-size", "16px")
+            .style("font-size", "25px")
             .style("text-decoration", "underline")
             .text("This can be a name");
     }
@@ -568,7 +568,7 @@ function tag_js(converted) {
             .attr("id", "dChartTitle")
             .attr("y", -39)
             .attr("text-anchor", "middle")
-            .style("font-size", "16px")
+            .style("font-size", "18px")
             .style("text-decoration", "underline")
             .text("You pick name Jon..lol");
 
