@@ -2,7 +2,7 @@ function tag_js(converted) {
     // var converted = <%=converted_data%>;
     // console.log("converted", converted);
 
-    console.log(typeof data)
+    //console.log(typeof data)
     var unitSoldArray = [];
     var savingsArray = [];
     var productDetails = {};
@@ -27,9 +27,9 @@ function tag_js(converted) {
             productDetails = {};
         };
     });
-    console.log("this is the new data", currentNetCostByProduct)
+    //console.log("this is the new data", currentNetCostByProduct)
     var data = currentNetCostByProduct;
-    console.log("yo", data)
+    //console.log("yo", data)
     var tooltip = d3.select('body').append('div')
         .attr('id', 'tooltip')
         .style('opacity', 0);
@@ -197,7 +197,7 @@ function tag_js(converted) {
     }
 
     function buildBarChart(product) {
-        console.log("this is the data from th onclick", product);
+        // console.log("this is the data from th onclick", product);
 
 
 
@@ -222,8 +222,8 @@ function tag_js(converted) {
         })
 
         //stackBarChartData.shift();
-        console.log("stackBarChartData", stackBarChartData);
-        console.log("primaryVendorData", primaryVendorData);
+        // console.log("stackBarChartData", stackBarChartData);
+        // console.log("primaryVendorData", primaryVendorData);
         var data = stackBarChartData;
         var tooltip = d3.select('body').append('div')
             .attr('id', 'tooltip')
@@ -315,7 +315,7 @@ function tag_js(converted) {
                     return "orange"
                 }
                 if (d.data.manufacturer_code == stackBarChartData[0].manufacturer_code) {
-                    console.log("Current", d);
+                    //   console.log("Current", d);
                     return "green"
                 } else {
                     return "blue"
@@ -435,7 +435,7 @@ function tag_js(converted) {
             pieChartHash["value"] = pieValues[i]
             pieChartArray.push(pieChartHash)
         });
-        console.log("lookatmenow", pieChartArray)
+        //  console.log("lookatmenow", pieChartArray)
         var arc = g.selectAll(".arc")
             .data(pie(pieChartArray))
             .enter().append("g")
@@ -523,10 +523,10 @@ function tag_js(converted) {
         var doughnutChart1 = [];
         var currentKeys = Object.keys(currentBeforeConfigure);
         var currentValues = Object.values(currentBeforeConfigure);
-        console.log("Keys", currentKeys)
-        console.log("Values", currentValues)
-            // console.log(currentValues.reduce(getSum))
-            // console.log(round(getPercentage(currentValues.reduce(getSum), currentValues[2]), 2))
+        // console.log("Keys", currentKeys)
+        // console.log("Values", currentValues)
+        // console.log(currentValues.reduce(getSum))
+        // console.log(round(getPercentage(currentValues.reduce(getSum), currentValues[2]), 2))
         currentKeys.forEach(function(d, i) {
             var doughnutChartHashCurrent = {};
             doughnutChartHashCurrent["manufacturer"] = d
@@ -543,9 +543,9 @@ function tag_js(converted) {
         });
 
         // console.log("current", currentBeforeConfigure)
-        console.log("one", oneBeforeConfigure)
-            // console.log("Other", doughnutChartCurrent)
-            // console.log("here", doughnutChart1)
+        //  console.log("one", oneBeforeConfigure)
+        // console.log("Other", doughnutChartCurrent)
+        // console.log("here", doughnutChart1)
         var dataset = doughnutChart1
         var tooltip = d3.select('body').append('div')
             .attr('id', 'tooltip')
