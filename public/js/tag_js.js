@@ -1,4 +1,23 @@
 function tag_js(converted) {
+    var legendsvg = d3.select("#scatterlegend").append("svg")
+        .attr("width", 150)
+        .attr("height", 50);
+
+    legendsvg.append("g")
+        .attr("class", "legendOrdinal")
+        .attr("transform", "translate(10,10)");
+
+    var categories = ["Not Selected", "Selected"];
+
+    var ordinal = d3.scaleOrdinal()
+        .domain(categories)
+        .range(["lightblue", "#4292c6"]);
+    var legendOrdinal = d3.legendColor()
+        .shape('circle')
+        .scale(ordinal);
+
+    legendsvg.select(".legendOrdinal")
+        .call(legendOrdinal);
     // var converted = <%=converted_data%>;
     // console.log("converted", converted);
 

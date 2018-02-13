@@ -12,12 +12,14 @@
 <body>
    
     <svg id="scatter" width="700" height="500"></svg>
+    <svg id="scatterLegend" width="150" height="500"></svg>
     <svg id="pieChart" width="400" height="400"></svg>
     <svg id="stackedChart" width="700" height="500"></svg>
     <svg id="donutChart" width="370" height="370"></svg>
 
 
     <script src="http://d3js.org/d3.v4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.24.0/d3-legend.js"></script>
     <script src="/js/tag_js.js"></script>
     <script>
         var converted = <%=converted_data%>;
