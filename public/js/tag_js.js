@@ -374,6 +374,25 @@ function tag_js(converted) {
             .style("font-size", "25px")
             .style("text-decoration", "underline")
             .text("This can be a name");
+        var legendsvg = d3.select("#stackedChart").append("svg")
+            .attr("x", 450)
+            .attr("width", 250)
+            .attr("height", 500);
+
+        legendsvg.append("g")
+            .attr("class", "legendOrdinal")
+            .attr("transform", "translate(10,10)");
+
+        var categories = ["Current Net Cost", "Current Total Rebate", "Same Current Net Cost", "Same Current Total Rebate", "Other Net Cost", "Other Total Rebate"];
+
+        var ordinal = d3.scaleOrdinal()
+            .domain(categories)
+            .range(["orange", "rgb(255, 203, 106)", "green", "rgba(98, 252, 98, 0.857)", "blue", "#4292c6"]);
+        var legendOrdinal = d3.legendColor()
+            .scale(ordinal);
+
+        legendsvg.select(".legendOrdinal")
+            .call(legendOrdinal);
     }
 
 
